@@ -1,0 +1,101 @@
+---
+name: queens
+channels:
+  - conda-forge
+  # We want to have a reproducible setup, so we don't want default channels,
+  # which may be different for different users. All required channels should
+  # be listed explicitly here.
+  - nodefaults
+dependencies:
+  - python==3.11
+  # to ensure that performance optimized backends are used,
+  # the following packages are installed from conda
+  # for example BLAS libraries like Intel MKL for numpy
+  - cython
+  - numba
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+
+  # Dask packages
+  - dask
+  - distributed  # dask.distributed
+  - dask-jobqueue
+  - bokeh  # for dask dashboard
+  - fabric   # for ssh connection
+
+  # Others
+  - xarray  # Special array format
+  - pyDOE  # design of experiments
+  - SALib  # for sensitivity analysis
+  - vtk==9.3.1 # vtk format handler
+  - pyvista
+  - autograd  # wrapper around numpy for automated differentiation
+  - chaospy  # polynomial chaos
+  - pyyaml  # to load yaml files
+  - jinja2
+
+  # Machine learning libraries
+  - arviz  # Bayesian visualization
+  - gpflow  # LV and variational GPs
+  - optax  # google jax based optimizer
+  - tensorflow
+  - tensorflow-probability
+  - jax
+  - pymc
+  - stable-baselines3
+
+  # making fancy plots
+  - matplotlib
+  - seaborn
+  - plotly
+
+  # testing framework
+  - pytest
+  - py
+  - pytest-codestyle
+  - pytest-cov
+  - pytest-mock
+  - pytest-xdist
+  - mock
+  - py
+
+  # Terminal utils
+  - pyfiglet  # make ascii  -art printsc
+  - tqdm  # a smart progress meter for loops
+  - tomli  # TOML parser
+
+  # Other Python stuff
+  - pathos  # multiprocessing with more complex python objects
+  - black>=24.4.2  # formatter for code created by QUEENS
+
+  # Development
+  - pylint>=2.16
+  - isort>=5.0
+  - pre-commit
+  - pre-commit-hooks>=4.4.0
+  - sphinx
+  - nbsphinx
+  - pydata-sphinx-theme
+  - pandoc
+  - commitizen>=3.12.0
+  - docformatter>=1.5.1
+  - yamllint>=1.19.0
+  - ruff
+  - myst-parser
+
+
+  # These packages need to be installed via pip
+  - pip
+  - pip:
+      - pip-tools
+      - gnuplotlib  # for gnuplot based terminal ascii plots
+      - diversipy  # sampling from space filling subsets
+      # Chopin et al. sequential Monte-Carlo, filtering/smoothing package
+      - particles
+      - liccheck
+      - pylint-exit
+      - scikit-activeml>=0.4.1
+      - chaospy>=4.3.13  # polynomial chaos
+      - licenseheaders
