@@ -116,6 +116,7 @@ class OpenFoam(Jobscript):
         # Set up input templates from case template directory
         input_templates = self._setup_input_templates(case_template_dir)
 
+
         # Configure extra options for template rendering
         extra_options = {
             "solver": solver,
