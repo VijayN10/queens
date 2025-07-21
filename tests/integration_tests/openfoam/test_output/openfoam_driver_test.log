@@ -1,119 +1,119 @@
-07-21 10:49 queens.utils.ascii_art INFO                                                                                       
-07-21 10:49 queens.utils.ascii_art INFO                                             *                                         
-07-21 10:49 queens.utils.ascii_art INFO                                           * | *                                       
-07-21 10:49 queens.utils.ascii_art INFO                                          * \|/ *                                      
-07-21 10:49 queens.utils.ascii_art INFO                                     * * * \|O|/ * * *                                 
-07-21 10:49 queens.utils.ascii_art INFO                                      \o\o\o|O|o/o/o/                                  
-07-21 10:49 queens.utils.ascii_art INFO                                      (<><><>O<><><>)                                  
-07-21 10:49 queens.utils.ascii_art INFO                                       '==========='                                   
-07-21 10:49 queens.utils.ascii_art INFO                                                                                       
-07-21 10:49 queens.utils.ascii_art INFO               :'#######::'##::::'##:'########:'########:'##::: ##::'######::         
-07-21 10:49 queens.utils.ascii_art INFO               '##.... ##: ##:::: ##: ##.....:: ##.....:: ###:: ##:'##... ##:         
-07-21 10:49 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ##::::::: ##::::::: ####: ##: ##:::..::         
-07-21 10:49 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ######::: ######::: ## ## ##:. ######::         
-07-21 10:49 queens.utils.ascii_art INFO                ##:'## ##: ##:::: ##: ##...:::: ##...:::: ##. ####::..... ##:         
-07-21 10:49 queens.utils.ascii_art INFO                ##:.. ##:: ##:::: ##: ##::::::: ##::::::: ##:. ###:'##::: ##:         
-07-21 10:49 queens.utils.ascii_art INFO               : ##### ##:. #######:: ########: ########: ##::. ##:. ######::         
-07-21 10:49 queens.utils.ascii_art INFO               :.....:..:::.......:::........::........::..::::..:::......:::         
-07-21 10:49 queens.utils.ascii_art INFO                                                                                      
-07-21 10:49 queens.utils.ascii_art INFO                                                                                      
-07-21 10:49 queens.utils.ascii_art INFO                A general purpose framework for Uncertainty Quantification,           
-07-21 10:49 queens.utils.ascii_art INFO                 Physics-Informed Machine Learning, Bayesian Optimization,            
-07-21 10:49 queens.utils.ascii_art INFO                         Inverse Problems and Simulation Analytics                    
-07-21 10:49 queens.utils.ascii_art INFO                                                                                      
-07-21 10:49 queens.distributions.uniform INFO     
-07-21 10:49 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.distributions.uniform INFO     |                                    Uniform                                    |
-07-21 10:49 queens.distributions.uniform INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
-07-21 10:49 queens.distributions.uniform INFO     | self        : <queens.distributions.uniform.Uniform object at 0x26c615610>    |
-07-21 10:49 queens.distributions.uniform INFO     | lower_bound : 0.5                                                             |
-07-21 10:49 queens.distributions.uniform INFO     | upper_bound : 2.0                                                             |
-07-21 10:49 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.distributions.uniform INFO     
-07-21 10:49 queens.distributions.uniform INFO     
-07-21 10:49 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.distributions.uniform INFO     |                                    Uniform                                    |
-07-21 10:49 queens.distributions.uniform INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
-07-21 10:49 queens.distributions.uniform INFO     | self        : <queens.distributions.uniform.Uniform object at 0x1b2d4f2d0>    |
-07-21 10:49 queens.distributions.uniform INFO     | lower_bound : -0.1                                                            |
-07-21 10:49 queens.distributions.uniform INFO     | upper_bound : 0.1                                                             |
-07-21 10:49 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.distributions.uniform INFO     
-07-21 10:49 queens.parameters.parameters INFO     
-07-21 10:49 queens.parameters.parameters INFO     +------------------------------------------------------------------------------------+
-07-21 10:49 queens.parameters.parameters INFO     |                                     Parameters                                     |
-07-21 10:49 queens.parameters.parameters INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-07-21 10:49 queens.parameters.parameters INFO     | self             : <queens.parameters.parameters.Parameters object at 0x1b2def310> |
-07-21 10:49 queens.parameters.parameters INFO     | lid_velocity     : <queens.distributions.uniform.Uniform object at 0x26c615610>    |
-07-21 10:49 queens.parameters.parameters INFO     | initial_pressure : <queens.distributions.uniform.Uniform object at 0x1b2d4f2d0>    |
-07-21 10:49 queens.parameters.parameters INFO     +------------------------------------------------------------------------------------+
-07-21 10:49 queens.parameters.parameters INFO     
-07-21 10:49 queens.drivers.openfoam INFO     
-07-21 10:49 queens.drivers.openfoam INFO     +-------------------------------------------------------------------------------------------+
-07-21 10:49 queens.drivers.openfoam INFO     |                                         OpenFoam                                          |
-07-21 10:49 queens.drivers.openfoam INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
-07-21 10:49 queens.drivers.openfoam INFO     | self                    : <queens.drivers.openfoam.OpenFoam object at 0x1b2d2c0d0>        |
-07-21 10:49 queens.drivers.openfoam INFO     | parameters              : <queens.parameters.parameters.Parameters object at 0x1b2def310> |
-07-21 10:49 queens.drivers.openfoam INFO     | case_template_dir       : './cavity_template'                                             |
-07-21 10:49 queens.drivers.openfoam INFO     | solver                  : 'icoFoam'                                                       |
-07-21 10:49 queens.drivers.openfoam INFO     | parallel                : False                                                           |
-07-21 10:49 queens.drivers.openfoam INFO     | num_procs               : 1                                                               |
-07-21 10:49 queens.drivers.openfoam INFO     | container_command       : None                                                            |
-07-21 10:49 queens.drivers.openfoam INFO     | openfoam_bashrc         : '/opt/openfoam9/etc/bashrc'                                     |
-07-21 10:49 queens.drivers.openfoam INFO     | check_mesh              : True                                                            |
-07-21 10:49 queens.drivers.openfoam INFO     | files_to_copy           : None                                                            |
-07-21 10:49 queens.drivers.openfoam INFO     | data_processor          : None                                                            |
-07-21 10:49 queens.drivers.openfoam INFO     | gradient_data_processor : None                                                            |
-07-21 10:49 queens.drivers.openfoam INFO     +-------------------------------------------------------------------------------------------+
-07-21 10:49 queens.drivers.openfoam INFO     
-07-21 10:49 queens.drivers.openfoam INFO     
-07-21 10:49 queens.drivers.openfoam INFO     +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-07-21 10:49 queens.drivers.openfoam INFO     |                                                                                                                                                                                                                                                                                                                                               OpenFoam                                                                                                                                                                                                                                                                                                                                               |
-07-21 10:49 queens.drivers.openfoam INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-07-21 10:49 queens.drivers.openfoam INFO     | self                             : <queens.drivers.openfoam.OpenFoam object at 0x1b2d2c0d0>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-07-21 10:49 queens.drivers.openfoam INFO     | parameters                       : <queens.parameters.parameters.Parameters object at 0x1b2def310>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-07-21 10:49 queens.drivers.openfoam INFO     | input_templates                  : {'0_U.template': 'cavity_template/0/U.template', '0_p.template': 'cavity_template/0/p.template', 'system_controlDict.template': 'cavity_template/system/controlDict.template'}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-07-21 10:49 queens.drivers.openfoam INFO     | jobscript_template               : '\n#!/bin/bash\n# OpenFOAM native execution script generated by QUEENS\n\nsource {{ openfoam_bashrc }}\ncd "{{ case_dir }}"\n\nif [ -f "system/blockMeshDict" ]; then\n    echo "Generating mesh..."\n    blockMesh\nfi\n\nif {{ check_mesh }}; then\n    echo "Checking mesh..."\n    checkMesh\nfi\n\n{% if parallel and num_procs > 1 %}\nif [ -f "system/decomposeParDict" ]; then\n    decomposePar\nfi\nmpirun -np {{ num_procs }} {{ solver }} -parallel > {{ log_file }} 2>&1\nif [ -f "system/decomposeParDict" ]; then\n    reconstructPar\nfi\n{% else %}\n{{ solver }} > {{ log_file }} 2>&1\n{% endif %}\n\necho "OpenFOAM simulation completed!"\n' |
-07-21 10:49 queens.drivers.openfoam INFO     | executable                       : 'icoFoam'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-07-21 10:49 queens.drivers.openfoam INFO     | files_to_copy                    : ['cavity_template']                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-07-21 10:49 queens.drivers.openfoam INFO     | data_processor                   : None                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-07-21 10:49 queens.drivers.openfoam INFO     | gradient_data_processor          : None                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-07-21 10:49 queens.drivers.openfoam INFO     | jobscript_file_name              : 'jobscript.sh'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-07-21 10:49 queens.drivers.openfoam INFO     | extra_options                    : {'solver': 'icoFoam', 'parallel': False, 'num_procs': 1, 'container_command': '', 'openfoam_bashrc': '/opt/openfoam9/etc/bashrc', 'check_mesh': 'true', 'log_file': 'log.icoFoam', 'case_dir': '.'}                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-07-21 10:49 queens.drivers.openfoam INFO     | raise_error_on_jobscript_failure : True                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-07-21 10:49 queens.drivers.openfoam INFO     +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-07-21 10:49 queens.drivers.openfoam INFO     
-07-21 10:49 queens.schedulers.pool INFO     
-07-21 10:49 queens.schedulers.pool INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.schedulers.pool INFO     |                                     Pool                                      |
-07-21 10:49 queens.schedulers.pool INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
-07-21 10:49 queens.schedulers.pool INFO     | self            : <queens.schedulers.pool.Pool object at 0x1b2e3c7d0>         |
-07-21 10:49 queens.schedulers.pool INFO     | experiment_name : 'openfoam_driver_test'                                      |
-07-21 10:49 queens.schedulers.pool INFO     | num_jobs        : 1                                                           |
-07-21 10:49 queens.schedulers.pool INFO     | verbose         : True                                                        |
-07-21 10:49 queens.schedulers.pool INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.schedulers.pool INFO     
-07-21 10:49 queens.utils.config_directories DEBUG    Creating folder /Users/user/queens-experiments.
-07-21 10:49 queens.utils.config_directories DEBUG    Creating folder /Users/user/queens-experiments/openfoam_driver_test.
-07-21 10:49 queens.models.simulation INFO     
-07-21 10:49 queens.models.simulation INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.models.simulation INFO     |                                  Simulation                                   |
-07-21 10:49 queens.models.simulation INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
-07-21 10:49 queens.models.simulation INFO     | self      : <queens.models.simulation.Simulation object at 0x1b2d4e350>       |
-07-21 10:49 queens.models.simulation INFO     | scheduler : <queens.schedulers.pool.Pool object at 0x1b2e3c7d0>               |
-07-21 10:49 queens.models.simulation INFO     | driver    : <queens.drivers.openfoam.OpenFoam object at 0x1b2d2c0d0>          |
-07-21 10:49 queens.models.simulation INFO     +-------------------------------------------------------------------------------+
-07-21 10:49 queens.models.simulation INFO     
-07-21 10:49 queens.iterators.monte_carlo INFO     
-07-21 10:49 queens.iterators.monte_carlo INFO     +--------------------------------------------------------------------------------------+
-07-21 10:49 queens.iterators.monte_carlo INFO     |                                      MonteCarlo                                      |
-07-21 10:49 queens.iterators.monte_carlo INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-07-21 10:49 queens.iterators.monte_carlo INFO     | self               : <queens.iterators.monte_carlo.MonteCarlo object at 0x1b2f964d0> |
-07-21 10:49 queens.iterators.monte_carlo INFO     | model              : <queens.models.simulation.Simulation object at 0x1b2d4e350>     |
-07-21 10:49 queens.iterators.monte_carlo INFO     | parameters         : <queens.parameters.parameters.Parameters object at 0x1b2def310> |
-07-21 10:49 queens.iterators.monte_carlo INFO     | global_settings    : <queens.global_settings.GlobalSettings object at 0x10bbf1390>   |
-07-21 10:49 queens.iterators.monte_carlo INFO     | seed               : 42                                                              |
-07-21 10:49 queens.iterators.monte_carlo INFO     | num_samples        : 2                                                               |
-07-21 10:49 queens.iterators.monte_carlo INFO     | result_description : {'write_results': True}                                         |
-07-21 10:49 queens.iterators.monte_carlo INFO     +--------------------------------------------------------------------------------------+
-07-21 10:49 queens.iterators.monte_carlo INFO     
+07-21 11:35 queens.utils.ascii_art INFO                                                                                       
+07-21 11:35 queens.utils.ascii_art INFO                                             *                                         
+07-21 11:35 queens.utils.ascii_art INFO                                           * | *                                       
+07-21 11:35 queens.utils.ascii_art INFO                                          * \|/ *                                      
+07-21 11:35 queens.utils.ascii_art INFO                                     * * * \|O|/ * * *                                 
+07-21 11:35 queens.utils.ascii_art INFO                                      \o\o\o|O|o/o/o/                                  
+07-21 11:35 queens.utils.ascii_art INFO                                      (<><><>O<><><>)                                  
+07-21 11:35 queens.utils.ascii_art INFO                                       '==========='                                   
+07-21 11:35 queens.utils.ascii_art INFO                                                                                       
+07-21 11:35 queens.utils.ascii_art INFO               :'#######::'##::::'##:'########:'########:'##::: ##::'######::         
+07-21 11:35 queens.utils.ascii_art INFO               '##.... ##: ##:::: ##: ##.....:: ##.....:: ###:: ##:'##... ##:         
+07-21 11:35 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ##::::::: ##::::::: ####: ##: ##:::..::         
+07-21 11:35 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ######::: ######::: ## ## ##:. ######::         
+07-21 11:35 queens.utils.ascii_art INFO                ##:'## ##: ##:::: ##: ##...:::: ##...:::: ##. ####::..... ##:         
+07-21 11:35 queens.utils.ascii_art INFO                ##:.. ##:: ##:::: ##: ##::::::: ##::::::: ##:. ###:'##::: ##:         
+07-21 11:35 queens.utils.ascii_art INFO               : ##### ##:. #######:: ########: ########: ##::. ##:. ######::         
+07-21 11:35 queens.utils.ascii_art INFO               :.....:..:::.......:::........::........::..::::..:::......:::         
+07-21 11:35 queens.utils.ascii_art INFO                                                                                      
+07-21 11:35 queens.utils.ascii_art INFO                                                                                      
+07-21 11:35 queens.utils.ascii_art INFO                A general purpose framework for Uncertainty Quantification,           
+07-21 11:35 queens.utils.ascii_art INFO                 Physics-Informed Machine Learning, Bayesian Optimization,            
+07-21 11:35 queens.utils.ascii_art INFO                         Inverse Problems and Simulation Analytics                    
+07-21 11:35 queens.utils.ascii_art INFO                                                                                      
+07-21 11:35 queens.distributions.uniform INFO     
+07-21 11:35 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.distributions.uniform INFO     |                                    Uniform                                    |
+07-21 11:35 queens.distributions.uniform INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+07-21 11:35 queens.distributions.uniform INFO     | self        : <queens.distributions.uniform.Uniform object at 0x1ab74d250>    |
+07-21 11:35 queens.distributions.uniform INFO     | lower_bound : 0.5                                                             |
+07-21 11:35 queens.distributions.uniform INFO     | upper_bound : 2.0                                                             |
+07-21 11:35 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.distributions.uniform INFO     
+07-21 11:35 queens.distributions.uniform INFO     
+07-21 11:35 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.distributions.uniform INFO     |                                    Uniform                                    |
+07-21 11:35 queens.distributions.uniform INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+07-21 11:35 queens.distributions.uniform INFO     | self        : <queens.distributions.uniform.Uniform object at 0x1b4d262d0>    |
+07-21 11:35 queens.distributions.uniform INFO     | lower_bound : -0.1                                                            |
+07-21 11:35 queens.distributions.uniform INFO     | upper_bound : 0.1                                                             |
+07-21 11:35 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.distributions.uniform INFO     
+07-21 11:35 queens.parameters.parameters INFO     
+07-21 11:35 queens.parameters.parameters INFO     +------------------------------------------------------------------------------------+
+07-21 11:35 queens.parameters.parameters INFO     |                                     Parameters                                     |
+07-21 11:35 queens.parameters.parameters INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+07-21 11:35 queens.parameters.parameters INFO     | self             : <queens.parameters.parameters.Parameters object at 0x1b51e7390> |
+07-21 11:35 queens.parameters.parameters INFO     | lid_velocity     : <queens.distributions.uniform.Uniform object at 0x1ab74d250>    |
+07-21 11:35 queens.parameters.parameters INFO     | initial_pressure : <queens.distributions.uniform.Uniform object at 0x1b4d262d0>    |
+07-21 11:35 queens.parameters.parameters INFO     +------------------------------------------------------------------------------------+
+07-21 11:35 queens.parameters.parameters INFO     
+07-21 11:35 queens.drivers.openfoam INFO     
+07-21 11:35 queens.drivers.openfoam INFO     +-------------------------------------------------------------------------------------------+
+07-21 11:35 queens.drivers.openfoam INFO     |                                         OpenFoam                                          |
+07-21 11:35 queens.drivers.openfoam INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+07-21 11:35 queens.drivers.openfoam INFO     | self                    : <queens.drivers.openfoam.OpenFoam object at 0x1b50f5210>        |
+07-21 11:35 queens.drivers.openfoam INFO     | parameters              : <queens.parameters.parameters.Parameters object at 0x1b51e7390> |
+07-21 11:35 queens.drivers.openfoam INFO     | case_template_dir       : './cavity_template'                                             |
+07-21 11:35 queens.drivers.openfoam INFO     | solver                  : 'icoFoam'                                                       |
+07-21 11:35 queens.drivers.openfoam INFO     | parallel                : False                                                           |
+07-21 11:35 queens.drivers.openfoam INFO     | num_procs               : 1                                                               |
+07-21 11:35 queens.drivers.openfoam INFO     | container_command       : None                                                            |
+07-21 11:35 queens.drivers.openfoam INFO     | openfoam_bashrc         : '/opt/openfoam9/etc/bashrc'                                     |
+07-21 11:35 queens.drivers.openfoam INFO     | check_mesh              : True                                                            |
+07-21 11:35 queens.drivers.openfoam INFO     | files_to_copy           : None                                                            |
+07-21 11:35 queens.drivers.openfoam INFO     | data_processor          : None                                                            |
+07-21 11:35 queens.drivers.openfoam INFO     | gradient_data_processor : None                                                            |
+07-21 11:35 queens.drivers.openfoam INFO     +-------------------------------------------------------------------------------------------+
+07-21 11:35 queens.drivers.openfoam INFO     
+07-21 11:35 queens.drivers.openfoam INFO     
+07-21 11:35 queens.drivers.openfoam INFO     +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+07-21 11:35 queens.drivers.openfoam INFO     |                                                                                                                                                                                                                                                                                                                                               OpenFoam                                                                                                                                                                                                                                                                                                                                               |
+07-21 11:35 queens.drivers.openfoam INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+07-21 11:35 queens.drivers.openfoam INFO     | self                             : <queens.drivers.openfoam.OpenFoam object at 0x1b50f5210>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+07-21 11:35 queens.drivers.openfoam INFO     | parameters                       : <queens.parameters.parameters.Parameters object at 0x1b51e7390>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+07-21 11:35 queens.drivers.openfoam INFO     | input_templates                  : {'0_U': 'cavity_template/0/U.template', '0_p': 'cavity_template/0/p.template', 'system_controlDict': 'cavity_template/system/controlDict.template'}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+07-21 11:35 queens.drivers.openfoam INFO     | jobscript_template               : '\n#!/bin/bash\n# OpenFOAM native execution script generated by QUEENS\n\nsource {{ openfoam_bashrc }}\ncd "{{ case_dir }}"\n\nif [ -f "system/blockMeshDict" ]; then\n    echo "Generating mesh..."\n    blockMesh\nfi\n\nif {{ check_mesh }}; then\n    echo "Checking mesh..."\n    checkMesh\nfi\n\n{% if parallel and num_procs > 1 %}\nif [ -f "system/decomposeParDict" ]; then\n    decomposePar\nfi\nmpirun -np {{ num_procs }} {{ solver }} -parallel > {{ log_file }} 2>&1\nif [ -f "system/decomposeParDict" ]; then\n    reconstructPar\nfi\n{% else %}\n{{ solver }} > {{ log_file }} 2>&1\n{% endif %}\n\necho "OpenFOAM simulation completed!"\n' |
+07-21 11:35 queens.drivers.openfoam INFO     | executable                       : 'icoFoam'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+07-21 11:35 queens.drivers.openfoam INFO     | files_to_copy                    : ['cavity_template']                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+07-21 11:35 queens.drivers.openfoam INFO     | data_processor                   : None                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+07-21 11:35 queens.drivers.openfoam INFO     | gradient_data_processor          : None                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+07-21 11:35 queens.drivers.openfoam INFO     | jobscript_file_name              : 'jobscript.sh'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+07-21 11:35 queens.drivers.openfoam INFO     | extra_options                    : {'solver': 'icoFoam', 'parallel': False, 'num_procs': 1, 'container_command': '', 'openfoam_bashrc': '/opt/openfoam9/etc/bashrc', 'check_mesh': 'true', 'log_file': 'log.icoFoam', 'case_dir': '.'}                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+07-21 11:35 queens.drivers.openfoam INFO     | raise_error_on_jobscript_failure : True                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+07-21 11:35 queens.drivers.openfoam INFO     +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+07-21 11:35 queens.drivers.openfoam INFO     
+07-21 11:35 queens.schedulers.pool INFO     
+07-21 11:35 queens.schedulers.pool INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.schedulers.pool INFO     |                                     Pool                                      |
+07-21 11:35 queens.schedulers.pool INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+07-21 11:35 queens.schedulers.pool INFO     | self            : <queens.schedulers.pool.Pool object at 0x1b50777d0>         |
+07-21 11:35 queens.schedulers.pool INFO     | experiment_name : 'openfoam_driver_test'                                      |
+07-21 11:35 queens.schedulers.pool INFO     | num_jobs        : 1                                                           |
+07-21 11:35 queens.schedulers.pool INFO     | verbose         : True                                                        |
+07-21 11:35 queens.schedulers.pool INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.schedulers.pool INFO     
+07-21 11:35 queens.utils.config_directories DEBUG    Creating folder /Users/user/queens-experiments.
+07-21 11:35 queens.utils.config_directories DEBUG    Creating folder /Users/user/queens-experiments/openfoam_driver_test.
+07-21 11:35 queens.models.simulation INFO     
+07-21 11:35 queens.models.simulation INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.models.simulation INFO     |                                  Simulation                                   |
+07-21 11:35 queens.models.simulation INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+07-21 11:35 queens.models.simulation INFO     | self      : <queens.models.simulation.Simulation object at 0x1b2e08c90>       |
+07-21 11:35 queens.models.simulation INFO     | scheduler : <queens.schedulers.pool.Pool object at 0x1b50777d0>               |
+07-21 11:35 queens.models.simulation INFO     | driver    : <queens.drivers.openfoam.OpenFoam object at 0x1b50f5210>          |
+07-21 11:35 queens.models.simulation INFO     +-------------------------------------------------------------------------------+
+07-21 11:35 queens.models.simulation INFO     
+07-21 11:35 queens.iterators.monte_carlo INFO     
+07-21 11:35 queens.iterators.monte_carlo INFO     +--------------------------------------------------------------------------------------+
+07-21 11:35 queens.iterators.monte_carlo INFO     |                                      MonteCarlo                                      |
+07-21 11:35 queens.iterators.monte_carlo INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+07-21 11:35 queens.iterators.monte_carlo INFO     | self               : <queens.iterators.monte_carlo.MonteCarlo object at 0x1b5075c90> |
+07-21 11:35 queens.iterators.monte_carlo INFO     | model              : <queens.models.simulation.Simulation object at 0x1b2e08c90>     |
+07-21 11:35 queens.iterators.monte_carlo INFO     | parameters         : <queens.parameters.parameters.Parameters object at 0x1b51e7390> |
+07-21 11:35 queens.iterators.monte_carlo INFO     | global_settings    : <queens.global_settings.GlobalSettings object at 0x10e073e90>   |
+07-21 11:35 queens.iterators.monte_carlo INFO     | seed               : 42                                                              |
+07-21 11:35 queens.iterators.monte_carlo INFO     | num_samples        : 2                                                               |
+07-21 11:35 queens.iterators.monte_carlo INFO     | result_description : {'write_results': True}                                         |
+07-21 11:35 queens.iterators.monte_carlo INFO     +--------------------------------------------------------------------------------------+
+07-21 11:35 queens.iterators.monte_carlo INFO     

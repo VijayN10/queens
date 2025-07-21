@@ -1,3 +1,17 @@
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (c) 2024-2025, QUEENS contributors.
+#
+# This file is part of QUEENS.
+#
+# QUEENS is free software: you can redistribute it and/or modify it under the terms of the GNU
+# Lesser General Public License as published by the Free Software Foundation, either version 3 of
+# the License, or (at your option) any later version. QUEENS is distributed in the hope that it will
+# be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You
+# should have received a copy of the GNU Lesser General Public License along with QUEENS. If not,
+# see <https://www.gnu.org/licenses/>.
+#
 """Driver to run OpenFOAM simulations."""
 
 import re
@@ -116,7 +130,6 @@ class OpenFoam(Jobscript):
         # Set up input templates from case template directory
         input_templates = self._setup_input_templates(case_template_dir)
 
-
         # Configure extra options for template rendering
         extra_options = {
             "solver": solver,
@@ -129,7 +142,7 @@ class OpenFoam(Jobscript):
             "case_dir": ".",
         }
 
-        # Set up files to copy
+        # Set up files to copy - ensure entire case template structure is copied
         if files_to_copy is None:
             files_to_copy = []
         
@@ -161,20 +174,81 @@ class OpenFoam(Jobscript):
         
         for template_file in template_files:
             relative_path = template_file.relative_to(case_path)
-            template_key = str(relative_path).replace("/", "_").replace("\\", "_")
+            
+            # Remove .template extension for output filename
+            output_relative_path = relative_path.with_suffix('')
+            
+            # Use the relative path as template key to maintain directory structure
+            # but replace path separators with underscores for the key
+            template_key = str(output_relative_path).replace("/", "_").replace("\\", "_")
+            
             input_templates[template_key] = str(template_file)
         
         return input_templates
+
+    def _manage_paths(self, job_id, experiment_dir):
+        """Override to properly handle OpenFOAM directory structure.
+        
+        Args:
+            job_id (int): Job ID.
+            experiment_dir (Path): Path to QUEENS experiment directory.
+
+        Returns:
+            job_dir (Path): Path to job directory.
+            output_dir (Path): Path to output directory.
+            output_file (Path): Path to output file(s).
+            input_files (dict): Dict with name and path of the input file(s).
+            log_file (Path): Path to log file.
+        """
+        job_dir = experiment_dir / str(job_id)
+        output_dir = job_dir / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        output_prefix = "output"
+        output_file = output_dir / output_prefix
+        log_file = output_dir / (output_prefix + ".log")
+
+        input_files = {}
+        for input_template_name, input_template_path in self.input_templates.items():
+            # For OpenFOAM, convert the template key back to proper path structure
+            # Convert "0_p" -> "0/p", "system_controlDict" -> "system/controlDict"
+            if "_" in input_template_name:
+                # Convert underscores back to path separators
+                relative_output_path = input_template_name.replace("_", "/")
+            else:
+                relative_output_path = input_template_name
+                
+            # Create full path for the output file
+            output_file_path = job_dir / relative_output_path
+            
+            # Ensure the directory exists
+            output_file_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            input_files[input_template_name] = output_file_path
+
+        return job_dir, output_dir, output_file, input_files, log_file
 
 
 class OpenFoamLogProcessor:
     """Data processor to extract results from OpenFOAM log files."""
     
     def __init__(self, log_file_pattern="log.*"):
+        """Initialize the log processor.
+        
+        Args:
+            log_file_pattern (str): Pattern to match log files
+        """
         self.log_file_pattern = log_file_pattern
     
     def __call__(self, job_options):
-        """Process OpenFOAM simulation results."""
+        """Process OpenFOAM simulation results.
+        
+        Args:
+            job_options: Job options containing output directory
+            
+        Returns:
+            dict: Dictionary containing extracted results
+        """
         results = {}
         output_dir = Path(job_options.output_dir)
         
@@ -201,7 +275,14 @@ class OpenFoamLogProcessor:
         return results
     
     def _extract_residuals(self, content):
-        """Extract residual data from log content."""
+        """Extract residual data from log content.
+        
+        Args:
+            content (str): Log file content
+            
+        Returns:
+            dict: Dictionary containing residual data
+        """
         residuals = {}
         
         residual_patterns = {
@@ -218,3 +299,150 @@ class OpenFoamLogProcessor:
                 residuals[f'{field}_final'] = float(matches[-1])
         
         return residuals
+
+
+class OpenFoamFieldProcessor:
+    """Data processor to extract field data from OpenFOAM results."""
+    
+    def __init__(self, fields=None, time_dirs=None):
+        """Initialize the field processor.
+        
+        Args:
+            fields (list): List of field names to extract (e.g., ['p', 'U'])
+            time_dirs (list): List of time directories to process (e.g., ['0', '1', 'latest'])
+        """
+        self.fields = fields or ['p', 'U']
+        self.time_dirs = time_dirs or ['latest']
+    
+    def __call__(self, job_options):
+        """Process OpenFOAM field results.
+        
+        Args:
+            job_options: Job options containing output directory
+            
+        Returns:
+            dict: Dictionary containing extracted field data
+        """
+        results = {}
+        case_dir = Path(job_options.output_dir).parent
+        
+        # Find time directories
+        time_directories = self._find_time_directories(case_dir)
+        
+        for time_dir in time_directories:
+            if 'latest' in self.time_dirs or time_dir.name in self.time_dirs:
+                time_results = {}
+                
+                for field in self.fields:
+                    field_file = time_dir / field
+                    if field_file.exists():
+                        time_results[field] = self._extract_field_statistics(field_file)
+                
+                results[f'time_{time_dir.name}'] = time_results
+        
+        return results
+    
+    def _find_time_directories(self, case_dir):
+        """Find time directories in the case.
+        
+        Args:
+            case_dir (Path): Path to OpenFOAM case directory
+            
+        Returns:
+            list: List of time directory paths
+        """
+        time_dirs = []
+        for item in case_dir.iterdir():
+            if item.is_dir():
+                try:
+                    # Check if directory name can be converted to float (time directories)
+                    float(item.name)
+                    time_dirs.append(item)
+                except ValueError:
+                    # Not a time directory
+                    continue
+        
+        # Sort by time value
+        time_dirs.sort(key=lambda x: float(x.name))
+        return time_dirs
+    
+    def _extract_field_statistics(self, field_file):
+        """Extract basic statistics from a field file.
+        
+        Args:
+            field_file (Path): Path to OpenFOAM field file
+            
+        Returns:
+            dict: Dictionary containing field statistics
+        """
+        try:
+            with open(field_file, 'r') as f:
+                content = f.read()
+            
+            # Extract internal field values (simplified parsing)
+            internal_field_match = re.search(r'internalField\s+uniform\s+([\d.e-]+)', content)
+            if internal_field_match:
+                return {
+                    'uniform_value': float(internal_field_match.group(1)),
+                    'type': 'uniform'
+                }
+            
+            # For non-uniform fields, could add more sophisticated parsing
+            return {'type': 'non-uniform', 'parsed': False}
+            
+        except Exception as e:
+            return {'error': str(e), 'parsed': False}
+
+
+class OpenFoamResidualProcessor:
+    """Specialized data processor for monitoring OpenFOAM convergence."""
+    
+    def __init__(self, target_residual=1e-6, max_iterations=None):
+        """Initialize the residual processor.
+        
+        Args:
+            target_residual (float): Target residual for convergence
+            max_iterations (int): Maximum number of iterations to consider
+        """
+        self.target_residual = target_residual
+        self.max_iterations = max_iterations
+    
+    def __call__(self, job_options):
+        """Process OpenFOAM residual data.
+        
+        Args:
+            job_options: Job options containing output directory
+            
+        Returns:
+            dict: Dictionary containing convergence analysis
+        """
+        log_processor = OpenFoamLogProcessor()
+        log_results = log_processor(job_options)
+        
+        if 'residuals' not in log_results:
+            return {'convergence_analysis': 'No residual data found'}
+        
+        residuals = log_results['residuals']
+        analysis = {}
+        
+        for field, values in residuals.items():
+            if isinstance(values, list) and len(values) > 0:
+                analysis[field] = {
+                    'initial': values[0],
+                    'final': values[-1],
+                    'converged': values[-1] < self.target_residual,
+                    'iterations': len(values),
+                    'reduction_factor': values[0] / values[-1] if values[-1] > 0 else float('inf')
+                }
+        
+        # Overall convergence assessment
+        converged_fields = [field for field, data in analysis.items() 
+                          if isinstance(data, dict) and data.get('converged', False)]
+        
+        analysis['overall'] = {
+            'converged': len(converged_fields) == len([k for k in analysis.keys() if k != 'overall']),
+            'converged_fields': converged_fields,
+            'target_residual': self.target_residual
+        }
+        
+        return analysis
