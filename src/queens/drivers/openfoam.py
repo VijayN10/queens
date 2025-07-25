@@ -106,21 +106,10 @@ class OpenFoam(Jobscript):
         data_processor=None,
         gradient_data_processor=None,
     ):
-        """Initialize OpenFoam driver.
-
-        Args:
-            parameters (Parameters): Parameters object for UQ study
-            case_template_dir (str, Path): Path to OpenFOAM case template directory
-            solver (str): OpenFOAM solver name (default: simpleFoam)
-            parallel (bool): Run simulation in parallel (default: False)
-            num_procs (int): Number of processors for parallel execution
-            container_command (str, optional): Container command for execution
-            openfoam_bashrc (str): Path to OpenFOAM bashrc file
-            check_mesh (bool): Run checkMesh before solving
-            files_to_copy (list, optional): Additional files to copy to case directory
-            data_processor (obj, optional): Data processor for results extraction
-            gradient_data_processor (obj, optional): Data processor for gradient data
-        """
+        """Initialize OpenFoam driver."""
+        # Store case template path for later use
+        self.case_template_dir = Path(case_template_dir)
+        
         # Select template based on execution mode
         if container_command:
             jobscript_template = _JOBSCRIPT_TEMPLATE_CONTAINER
@@ -142,24 +131,50 @@ class OpenFoam(Jobscript):
             "case_dir": ".",
         }
 
-        # Set up files to copy - ensure entire case template structure is copied
-        if files_to_copy is None:
-            files_to_copy = []
-        
-        case_template_path = Path(case_template_dir)
-        if case_template_path.exists():
-            files_to_copy.append(str(case_template_path))
-
+        # Don't use files_to_copy for static files - we'll handle them in run()
         super().__init__(
             parameters=parameters,
             input_templates=input_templates,
             jobscript_template=jobscript_template,
             executable=solver,
-            files_to_copy=files_to_copy,
+            files_to_copy=files_to_copy or [],  # Only user-specified files
             data_processor=data_processor,
             gradient_data_processor=gradient_data_processor,
             extra_options=extra_options,
         )
+
+    def run(self, sample, job_id, num_procs, experiment_dir, experiment_name):
+        """Override run to copy static files to each job directory."""
+        # Get job directory path
+        job_dir = experiment_dir / str(job_id)
+        
+        # Copy static files to this specific job directory
+        self._copy_static_files_to_job_dir(job_dir)
+        
+        # Call parent run method
+        return super().run(sample, job_id, num_procs, experiment_dir, experiment_name)
+
+    def _copy_static_files_to_job_dir(self, job_dir):
+        """Copy all non-template files to the job directory."""
+        import shutil
+        
+        if not self.case_template_dir.exists():
+            return
+        
+        # Copy all non-template files while preserving directory structure
+        for item in self.case_template_dir.rglob("*"):
+            if item.is_file() and item.suffix != ".template":
+                # Get relative path from template directory
+                relative_path = item.relative_to(self.case_template_dir)
+                
+                # Target path in job directory
+                target_path = job_dir / relative_path
+                
+                # Create parent directories if needed
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Copy the file
+                shutil.copy2(item, target_path)
 
     def _setup_input_templates(self, case_template_dir):
         """Set up input templates from case template directory."""
