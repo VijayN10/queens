@@ -43,6 +43,7 @@ def test_openfoam_driver():
             parallel=False,
             num_procs=1,
             container_command=None,  # or your container cmd if needed
+            openfoam_bashrc="/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/openfoam-org-9-yjq7t3b3xh75m5s7u5bntedww5u7sekn/etc/bashrc"
         )
         print("✅ Driver initialized")
         
