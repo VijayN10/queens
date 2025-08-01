@@ -127,8 +127,7 @@ class OpenFoam(Jobscript):
             "container_command": container_command or "",
             "openfoam_bashrc": openfoam_bashrc,
             "check_mesh": "true" if check_mesh else "false",
-            "log_file": f"log.{solver}",
-            "case_dir": ".",
+            "log_file": f"log.{solver}"
         }
 
         # Don't use files_to_copy for static files - we'll handle them in run()
@@ -143,16 +142,32 @@ class OpenFoam(Jobscript):
             extra_options=extra_options,
         )
 
+
     def run(self, sample, job_id, num_procs, experiment_dir, experiment_name):
-        """Override run to copy static files to each job directory."""
-        # Get job directory path
+        """Override run to copy static files and set correct case directory."""
+        # Get job directory path  
         job_dir = experiment_dir / str(job_id)
         
         # Copy static files to this specific job directory
         self._copy_static_files_to_job_dir(job_dir)
         
-        # Call parent run method
-        return super().run(sample, job_id, num_procs, experiment_dir, experiment_name)
+        # Update jobscript options with the correct case directory
+        # Store original case_dir to restore later
+        original_case_dir = self.jobscript_options.get("case_dir")
+        
+        # Set case_dir to the absolute path of the job directory
+        self.jobscript_options["case_dir"] = str(job_dir)
+        
+        try:
+            # Call parent run method
+            result = super().run(sample, job_id, num_procs, experiment_dir, experiment_name)
+            return result
+        finally:
+            # Restore original case_dir
+            if original_case_dir is not None:
+                self.jobscript_options["case_dir"] = original_case_dir
+
+
 
     def _copy_static_files_to_job_dir(self, job_dir):
         """Copy all non-template files to the job directory."""

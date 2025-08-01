@@ -64,11 +64,11 @@ def test_openfoam_driver():
             model=model,
             parameters=parameters,
             global_settings=global_settings,
-            num_samples=3,
+            num_samples=5,
             seed=42,
             result_description={"write_results": True, "plot_results": False},
         )
-        print("✅ Iterator created → ready to generate 2 samples\n")
+        print(f"✅ Iterator created → ready to generate {iterator.num_samples} samples\n")
         
         return iterator, global_settings
 
