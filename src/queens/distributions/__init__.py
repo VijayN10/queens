@@ -29,18 +29,3 @@ from queens.distributions.normal import Normal
 from queens.distributions.particle import Particle
 from queens.distributions.uniform import Uniform
 from queens.distributions.uniform_discrete import UniformDiscrete
-
-VALID_TYPES = {
-    "normal": Normal,
-    "mean_field_normal": MeanFieldNormal,
-    "uniform": Uniform,
-    "lognormal": LogNormal,
-    "beta": Beta,
-    "exponential": Exponential,
-    "free": FreeVariable,
-    "categorical": Categorical,
-    "bernoulli": Bernoulli,
-    "multinomial": Multinomial,
-    "particles": Particle,
-    "uniform_discrete": UniformDiscrete,
-}

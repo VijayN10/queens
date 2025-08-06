@@ -20,7 +20,6 @@ import numpy as np
 
 from queens.data_processors.pvd_file import PvdFile
 from queens.distributions.uniform import Uniform
-from queens.drivers.fourc import Fourc
 from queens.iterators.monte_carlo import MonteCarlo
 from queens.main import run_iterator
 from queens.models.simulation import Simulation
@@ -28,6 +27,7 @@ from queens.parameters.parameters import Parameters
 from queens.schedulers.local import Local
 from queens.utils.config_directories import experiment_directory
 from queens.utils.io import load_result, read_file
+from queens_interfaces.fourc.driver import Fourc
 
 _logger = logging.getLogger(__name__)
 

@@ -21,5 +21,3 @@ from queens.schedulers._scheduler import Scheduler
 from queens.schedulers.cluster import Cluster
 from queens.schedulers.local import Local
 from queens.schedulers.pool import Pool
-
-VALID_TYPES = {"local": Local, "cluster": Cluster, "pool": Pool}

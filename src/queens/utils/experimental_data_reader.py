@@ -114,6 +114,3 @@ class ExperimentalDataReader:
             self.coordinate_labels,
             self.output_label,
         )
-
-
-VALID_TYPES = {"experimental_data_reader": ExperimentalDataReader}

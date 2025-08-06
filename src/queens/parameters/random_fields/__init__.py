@@ -20,9 +20,3 @@ Modules for random fields.
 from queens.parameters.random_fields.fourier import Fourier
 from queens.parameters.random_fields.karhunen_loeve import KarhunenLoeve
 from queens.parameters.random_fields.piece_wise import PieceWise
-
-VALID_TYPES = {
-    "kl": KarhunenLoeve,
-    "fourier": Fourier,
-    "piece-wise": PieceWise,
-}

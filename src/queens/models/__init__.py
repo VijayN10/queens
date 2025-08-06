@@ -31,20 +31,3 @@ from queens.models.surrogates.gaussian_process import GaussianProcess
 from queens.models.surrogates.heteroskedastic_gaussian_process import HeteroskedasticGaussianProcess
 from queens.models.surrogates.jitted_gaussian_process import JittedGaussianProcess
 from queens.models.surrogates.variational_gaussian_process import VariationalGaussianProcess
-
-VALID_TYPES = {
-    "simulation_model": Simulation,
-    "bmfmc_model": BMFMC,
-    "gaussian": Gaussian,
-    "bmf_gaussian": BMFGaussian,
-    "bmfia_interface": BmfiaInterface,
-    "differentiable_simulation_model_fd": FiniteDifference,
-    "differentiable_simulation_model_adjoint": Adjoint,
-    "heteroskedastic_gp": HeteroskedasticGaussianProcess,
-    "gp_approximation_gpflow": GaussianProcess,
-    "gaussian_bayesian_neural_network": GaussianBayesianNeuralNetwork,
-    "gp_jitted": JittedGaussianProcess,
-    "gp_approximation_gpflow_svgp": VariationalGaussianProcess,
-    "gaussian_nn": GaussianNeuralNetwork,
-    "reinforcement_learning": ReinforcementLearning,
-}

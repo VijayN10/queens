@@ -19,7 +19,9 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 
-from queens.parameters.parameters import from_config_create_parameters
+from queens.distributions import Normal
+from queens.parameters.parameters import Parameters
+from queens.parameters.random_fields import Fourier, KarhunenLoeve, PieceWise
 
 
 @pytest.fixture(name="parameters", scope="module")
@@ -136,25 +138,25 @@ def fixture_parameters(pre_processor):
             ),
         )
     )
-    parameters_dict = {
-        "field_1": {"type": "kl", "corr_length": 0.3, "std": 0.5, "explained_variance": 0.9},
-        "field_2": {
-            "type": "fourier",
-            "corr_length": 0.3,
-            "std": 0.5,
-            "variability": 0.1,
-            "trunc_threshold": 1,
-        },
-        "field_3": {
-            "type": "piece-wise",
-            "distribution": {
-                "type": "normal",
-                "mean": [0],
-                "covariance": [[1]],
-            },
-        },
-    }
-    parameters = from_config_create_parameters(parameters_dict, pre_processor=pre_processor)
+
+    field_1 = KarhunenLoeve(
+        coords=pre_processor.coords_dict["field_1"],
+        corr_length=0.3,
+        std=0.5,
+        explained_variance=0.9,
+    )
+    field_2 = Fourier(
+        coords=pre_processor.coords_dict["field_2"],
+        corr_length=0.3,
+        std=0.5,
+        variability=0.1,
+        trunc_threshold=1,
+    )
+    field_3 = PieceWise(
+        coords=pre_processor.coords_dict["field_3"], latent_1d_distribution=Normal(0, 1)
+    )
+
+    parameters = Parameters(field_1=field_1, field_2=field_2, field_3=field_3)
     return parameters
 
 

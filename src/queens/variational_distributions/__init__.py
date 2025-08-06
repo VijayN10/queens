@@ -22,8 +22,3 @@ from queens.variational_distributions.joint import Joint
 from queens.variational_distributions.mean_field_normal import MeanFieldNormal
 from queens.variational_distributions.mixture_model import MixtureModel
 from queens.variational_distributions.particle import Particle
-
-VALID_TYPES = {
-    "mean_field_variational": MeanFieldNormal,
-    "full_rank_variational": FullRankNormal,
-}

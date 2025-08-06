@@ -18,40 +18,11 @@ import logging
 
 import numpy as np
 
-from queens.distributions import VALID_TYPES as VALID_DISTRIBUTION_TYPES
 from queens.distributions._distribution import Continuous
-from queens.parameters.random_fields import VALID_TYPES as VALID_FIELD_TYPES
 from queens.parameters.random_fields._random_field import RandomField
-from queens.utils.imports import get_module_class
 from queens.utils.logger_settings import log_init_args
 
-VALID_TYPES = VALID_DISTRIBUTION_TYPES | VALID_FIELD_TYPES
-
 _logger = logging.getLogger(__name__)
-
-
-def from_config_create_parameters(parameters_options, pre_processor=None):
-    """Create a QUEENS parameter object from config.
-
-    Args:
-        parameters_options (dict): Parameters description
-        pre_processor (obj, optional): Pre-processor object to read coordinates of random field
-                                       discretization
-    """
-    joint_parameters_dict = {}
-    for parameter_name, parameter_dict in parameters_options.items():
-        parameter_class = get_module_class(parameter_dict, VALID_TYPES)
-        if issubclass(parameter_class, Continuous):
-            parameter_object = parameter_class(**parameter_dict)
-        elif issubclass(parameter_class, RandomField):
-            parameter_object = parameter_class(
-                **parameter_dict, coords=pre_processor.coords_dict[parameter_name]
-            )
-        else:
-            raise NotImplementedError(f"Parameter type '{parameter_class.__name__}' not supported.")
-        joint_parameters_dict[parameter_name] = parameter_object
-
-    return Parameters(**joint_parameters_dict)
 
 
 def _add_parameters_keys(parameters_keys, parameter_name, dimension):

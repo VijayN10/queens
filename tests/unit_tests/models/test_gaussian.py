@@ -128,7 +128,7 @@ def test_evaluate(mocker, my_lik_model):
     my_lik_model.noise_type = "MAP_abc"
     m1 = mocker.patch("queens.models.likelihoods.gaussian.Gaussian.update_covariance")
     response = my_lik_model.evaluate(samples)["result"]
-    assert m1.called_once_with(3.0)
+    m1.assert_called_once_with(np.array([[2.0]]))
 
 
 def test_update_covariance(my_lik_model):

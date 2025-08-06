@@ -14,10 +14,9 @@
 #
 """Piece-wise random fields class."""
 
-from queens.distributions import VALID_TYPES as distribution_types
-from queens.distributions.mean_field_normal import MeanFieldNormal
+from copy import deepcopy
+
 from queens.parameters.random_fields._random_field import RandomField
-from queens.utils.imports import get_module_class
 
 
 class PieceWise(RandomField):
@@ -32,53 +31,20 @@ class PieceWise(RandomField):
             latent_1d_distribution: (obj): QUEENS distribution object of latent space variables
     """
 
-    def __init__(self, coords, distribution):
+    def __init__(self, coords, latent_1d_distribution):
         """Initialize RF object.
 
         Args:
             coords (dict): Dictionary with coordinates of discretized random field and the
                            corresponding keys
-            distribution (dict): Dictionary with the distributions and hyperparameters of the random
-                                variables, has to be a 1D distribution.
+            latent_1d_distribution (Distribution): Latent 1d distribution that is used for all
+                                                   variables.
         """
         super().__init__(coords)
         self.dimension = self.dim_coords
-        self.distribution, self.latent_1d_distribution = self.create_latent_distribution(
-            distribution
-        )
-
-    def create_latent_distribution(self, latent_dict):
-        """Create a distribution object for the latent space.
-
-        Create one distribution of the same kind for all pieces. To save on resourcess only a 1D
-        distribution is created and used for all variables.
-
-        Args:
-            latent_dict (dict): Dict with parameters of latent space
-
-        Returns:
-            distribution (obj): QUEENS distribution object of latent space
-        """
-        if latent_dict["type"] == "normal":
-            # use the MeanFieldNormal to prevent shape issues
-            distribution = MeanFieldNormal(
-                mean=latent_dict["mean"],
-                variance=latent_dict["covariance"],
-                dimension=self.dimension,
-            )
-            latent_1d_distribution = MeanFieldNormal(
-                mean=latent_dict["mean"],
-                variance=latent_dict["covariance"],
-                dimension=1,
-            )
-        elif latent_dict["type"] in distribution_types:
-            distribution_class = get_module_class(latent_dict, distribution_types)
-            distribution = distribution_class(**latent_dict)
-            distribution.dimension = self.dimension
-            latent_1d_distribution = distribution_class(**latent_dict)
-        else:
-            raise ValueError("Distribution not supported.")
-        return distribution, latent_1d_distribution
+        self.latent_1d_distribution = latent_1d_distribution
+        self.distribution = deepcopy(latent_1d_distribution)
+        self.distribution.dimension = self.dimension
 
     def draw(self, num_samples):
         """Draw samples from the latent representation of the random field.

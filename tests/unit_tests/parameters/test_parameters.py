@@ -19,7 +19,7 @@ import pytest
 
 from queens.distributions.normal import Normal
 from queens.distributions.uniform import Uniform
-from queens.parameters.parameters import Parameters, from_config_create_parameters
+from queens.parameters.parameters import Parameters
 
 
 @pytest.fixture(name="parameters_set_1", scope="module")
@@ -165,20 +165,3 @@ def fixture_pre_processor():
             }
 
     return PreProcessor()
-
-
-def test_from_config_create_parameters_options_3(parameters_options_3, pre_processor):
-    """Test from_config_create_parameters method with random fields."""
-    parameters = from_config_create_parameters(parameters_options_3, pre_processor)
-
-    assert parameters.num_parameters == 5
-    assert parameters.parameters_keys == [
-        "x1",
-        "x2_0",
-        "x2_1",
-        "random_inflow_0",
-        "random_inflow_1",
-        "random_inflow_2",
-    ]
-    assert parameters.random_field_flag
-    assert parameters.names == ["x1", "x2", "random_inflow"]

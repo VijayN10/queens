@@ -293,10 +293,3 @@ def relative_change(old_value, new_value, norm):
     increment = old_value - new_value
     increment = np.nan_to_num(increment)
     return norm(increment) / (norm(old_value) + 1e-16)
-
-
-VALID_TYPES = {
-    "moving_average": MovingAveraging,
-    "polyak_averaging": PolyakAveraging,
-    "exponential_averaging": ExponentialAveraging,
-}

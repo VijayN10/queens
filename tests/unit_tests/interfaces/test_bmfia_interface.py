@@ -492,8 +492,8 @@ def test_evaluate_per_coordinate(default_bmfia_interface, mocker):
         z_lf, support, probabilistic_mapping_obj_lst, None, None
     )
 
-    assert map_1.predict.called_once()
-    assert map_2.predict.called_once()
+    map_1.predict.assert_called_once()
+    map_2.predict.assert_called_once()
 
     np.testing.assert_array_equal(map_1.predict.call_args[0][0], z_lf.T[0, :, :])
     assert map_1.predict.call_args[1]["support"] == support
@@ -659,8 +659,8 @@ def test_evaluate_and_gradient_per_coordinate(mocker):
         Z_LF, support, probabilistic_mapping_obj_lst, None, None
     )
 
-    assert map_1.predict.called_once()
-    assert map_2.predict.called_once()
+    map_1.predict.assert_called_once()
+    map_2.predict.assert_called_once()
 
     np.testing.assert_array_equal(map_1.predict.call_args[0][0], Z_LF.T[0, :, :])
     assert map_1.predict.call_args[1]["support"] == support

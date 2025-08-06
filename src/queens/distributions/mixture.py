@@ -19,9 +19,7 @@ import logging
 import numpy as np
 from scipy.special import logsumexp
 
-from queens.distributions import VALID_TYPES
 from queens.distributions._distribution import Continuous
-from queens.utils.imports import get_module_class
 from queens.utils.logger_settings import log_init_args
 
 _logger = logging.getLogger(__name__)
@@ -60,27 +58,6 @@ class Mixture(Continuous):
 
         mean, covariance = self._compute_mean_and_covariance(weights, component_distributions)
         super().__init__(mean, covariance, component_distributions[0].dimension)
-
-    @classmethod
-    def from_config_create_distribution(cls, distribution_options):
-        """Create mixture model from config.
-
-        Args:
-            distribution_options (dict): description of the distribution
-
-        Returns:
-            Mixture: mixture model
-        """
-        distribution_options_copy = distribution_options.copy()
-        distribution_options_copy.pop("type")
-        component_keys = distribution_options_copy.pop("component_distributions_names")
-        component_distributions = []
-        for key in component_keys:
-            component_options = distribution_options_copy.pop(key)
-            parameter_class = get_module_class(component_options, VALID_TYPES)
-            component_distributions.append(parameter_class(**component_options))
-        distribution_options_copy["component_distributions"] = component_distributions
-        return cls(**distribution_options_copy)
 
     @staticmethod
     def _compute_mean_and_covariance(weights, component_distributions):

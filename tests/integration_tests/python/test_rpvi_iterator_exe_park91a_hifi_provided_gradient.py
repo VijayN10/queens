@@ -19,7 +19,7 @@ import pytest
 
 from queens.data_processors import CsvFile
 from queens.distributions import Normal
-from queens.drivers import Mpi
+from queens.drivers import Jobscript
 from queens.iterators import RPVI
 from queens.main import run_iterator
 from queens.models import Adjoint, FiniteDifference, Gaussian, Simulation
@@ -39,17 +39,10 @@ def fixture_python_path():
     return stdout.strip()
 
 
-@pytest.fixture(name="mpirun_path", scope="session")
-def fixture_mpi_run_path():
-    """Path to the mpirun executable."""
-    _, _, stdout, _ = run_subprocess("which mpirun")
-    return stdout.strip()
-
-
-@pytest.fixture(name="mpi_command", scope="session")
-def fixture_mpi_command(mpirun_path):
-    """Base command to call mpirun with Mpi."""
-    return mpirun_path + " --bind-to none"
+@pytest.fixture(name="rpvi_jobscript_template", scope="session")
+def fixture_rpvi_jobscript_template():
+    """Jobscript template for the Jobscript driver in rpvi test cases."""
+    return "{{ executable }} {{ input_file }} {{ output_file }}"
 
 
 def test_rpvi_iterator_exe_park91a_hifi_provided_gradient(
@@ -58,7 +51,7 @@ def test_rpvi_iterator_exe_park91a_hifi_provided_gradient(
     example_simulator_fun_dir,
     _create_input_file_executable_park91a_hifi_on_grid,
     python_path,
-    mpi_command,
+    rpvi_jobscript_template,
     global_settings,
 ):
     """Test for the *rpvi* iterator based on the *park91a_hifi* function."""
@@ -108,13 +101,13 @@ def test_rpvi_iterator_exe_park91a_hifi_provided_gradient(
             "filter": {"type": "entire_file"},
         },
     )
-    driver = Mpi(
+    driver = Jobscript(
         parameters=parameters,
         input_templates=third_party_input_file,
         executable=executable,
         data_processor=data_processor,
         gradient_data_processor=gradient_data_processor,
-        mpi_cmd=mpi_command,
+        jobscript_template=rpvi_jobscript_template,
     )
     forward_model = Simulation(scheduler=scheduler, driver=driver)
     model = Gaussian(
@@ -171,7 +164,7 @@ def test_rpvi_iterator_exe_park91a_hifi_finite_differences_gradient(
     example_simulator_fun_dir,
     _create_input_file_executable_park91a_hifi_on_grid,
     python_path,
-    mpi_command,
+    rpvi_jobscript_template,
     global_settings,
 ):
     """Test for the *rpvi* iterator based on the *park91a_hifi* function."""
@@ -214,12 +207,12 @@ def test_rpvi_iterator_exe_park91a_hifi_finite_differences_gradient(
             "filter": {"type": "entire_file"},
         },
     )
-    driver = Mpi(
+    driver = Jobscript(
         parameters=parameters,
         input_templates=third_party_input_file,
         executable=executable,
         data_processor=data_processor,
-        mpi_cmd=mpi_command,
+        jobscript_template=rpvi_jobscript_template,
     )
     forward_model = FiniteDifference(
         scheduler=scheduler, driver=driver, finite_difference_method="2-point"
@@ -277,7 +270,7 @@ def test_rpvi_iterator_exe_park91a_hifi_adjoint_gradient(
     example_simulator_fun_dir,
     _create_input_file_executable_park91a_hifi_on_grid,
     python_path,
-    mpi_command,
+    rpvi_jobscript_template,
     global_settings,
 ):
     """Test the *rpvi* iterator based on the *park91a_hifi* function."""
@@ -326,12 +319,12 @@ def test_rpvi_iterator_exe_park91a_hifi_adjoint_gradient(
             "filter": {"type": "entire_file"},
         },
     )
-    driver = Mpi(
+    driver = Jobscript(
         parameters=parameters,
         input_templates=third_party_input_file,
         executable=executable,
         data_processor=data_processor,
-        mpi_cmd=mpi_command,
+        jobscript_template=rpvi_jobscript_template,
     )
     gradient_data_processor = CsvFile(
         file_name_identifier="*_gradient.csv",
@@ -340,12 +333,12 @@ def test_rpvi_iterator_exe_park91a_hifi_adjoint_gradient(
             "filter": {"type": "entire_file"},
         },
     )
-    adjoint_driver = Mpi(
+    adjoint_driver = Jobscript(
         parameters=parameters,
         input_templates=third_party_input_file,
         executable=adjoint_executable,
         data_processor=gradient_data_processor,
-        mpi_cmd=mpi_command,
+        jobscript_template=rpvi_jobscript_template,
     )
     forward_model = Adjoint(
         adjoint_file="grad_objective.csv",

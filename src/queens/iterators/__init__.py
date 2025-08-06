@@ -42,30 +42,3 @@ from queens.iterators.sequential_monte_carlo_chopin import SequentialMonteCarloC
 from queens.iterators.sobol_index import SobolIndex
 from queens.iterators.sobol_index_gp_uncertainty import SobolIndexGPUncertainty
 from queens.iterators.sobol_sequence import SobolSequence
-
-VALID_TYPES = {
-    "hmc": HamiltonianMonteCarlo,
-    "lhs": LatinHypercubeSampling,
-    "metropolis_hastings": MetropolisHastings,
-    "metropolis_hastings_pymc": MetropolisHastingsPyMC,
-    "monte_carlo": MonteCarlo,
-    "nuts": NUTS,
-    "optimization": Optimization,
-    "read_data_from_file": Data,
-    "elementary_effects": ElementaryEffects,
-    "polynomial_chaos": PolynomialChaos,
-    "sobol_indices": SobolIndex,
-    "sobol_indices_gp_uncertainty": SobolIndexGPUncertainty,
-    "smc": SequentialMonteCarlo,
-    "smc_chopin": SequentialMonteCarloChopin,
-    "sobol_sequence": SobolSequence,
-    "points": Points,
-    "bmfmc": BMFMC,
-    "grid": Grid,
-    "least_squares": LeastSquares,
-    "bbvi": BBVI,
-    "bmfia": BMFIA,
-    "rpvi": RPVI,
-    "classification": ClassificationIterator,
-    "reinforcement_learning": ReinforcementLearning,
-}
