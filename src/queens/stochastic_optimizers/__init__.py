@@ -16,8 +16,19 @@
 
 Modules containing stochastic optimizers.
 """
+from typing import TYPE_CHECKING
 
-from queens.stochastic_optimizers.adam import Adam
-from queens.stochastic_optimizers.adamax import Adamax
-from queens.stochastic_optimizers.rms_prop import RMSprop
-from queens.stochastic_optimizers.sgd import SGD
+from queens.utils.imports import extract_type_checking_imports, import_class_from_class_module_map
+
+if TYPE_CHECKING:
+    from queens.stochastic_optimizers.adam import Adam
+    from queens.stochastic_optimizers.adamax import Adamax
+    from queens.stochastic_optimizers.rms_prop import RMSprop
+    from queens.stochastic_optimizers.sgd import SGD
+
+
+class_module_map = extract_type_checking_imports(__file__)
+
+
+def __getattr__(name):
+    return import_class_from_class_module_map(name, class_module_map, __name__)

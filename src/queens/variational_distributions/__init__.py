@@ -16,9 +16,19 @@
 
 Modules containing probability distributions for variational inference.
 """
+from typing import TYPE_CHECKING
 
-from queens.variational_distributions.full_rank_normal import FullRankNormal
-from queens.variational_distributions.joint import Joint
-from queens.variational_distributions.mean_field_normal import MeanFieldNormal
-from queens.variational_distributions.mixture_model import MixtureModel
-from queens.variational_distributions.particle import Particle
+from queens.utils.imports import extract_type_checking_imports, import_class_from_class_module_map
+
+if TYPE_CHECKING:
+    from queens.variational_distributions.full_rank_normal import FullRankNormal
+    from queens.variational_distributions.joint import Joint
+    from queens.variational_distributions.mean_field_normal import MeanFieldNormal
+    from queens.variational_distributions.mixture_model import MixtureModel
+    from queens.variational_distributions.particle import Particle
+
+class_module_map = extract_type_checking_imports(__file__)
+
+
+def __getattr__(name):
+    return import_class_from_class_module_map(name, class_module_map, __name__)

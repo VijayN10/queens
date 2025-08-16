@@ -30,10 +30,12 @@ allowing users to easily integrate the SVGP model into their machine learning wo
 """
 
 import logging
-from typing import TYPE_CHECKING
 
+import gpflow as gpf
 import numpy as np
+import tensorflow as tf
 import tensorflow_probability as tfp
+import tf_keras as keras
 
 from queens.models.surrogates._surrogate import Surrogate
 from queens.utils.configure_tensorflow import configure_keras, configure_tensorflow
@@ -43,19 +45,8 @@ from queens.utils.numpy_array import extract_block_diag
 
 _logger = logging.getLogger(__name__)
 
-# This allows autocomplete in the IDE
-if TYPE_CHECKING:
-    import gpflow as gpf
-    import tensorflow as tf
-else:
-    from queens.utils.imports import LazyLoader
-
-    tf = LazyLoader("tensorflow")
-    keras = LazyLoader("tf_keras")
-    gpf = LazyLoader("gpflow")
-
-    configure_tensorflow(tf)
-    configure_keras(keras)
+configure_tensorflow(tf)
+configure_keras(keras)
 
 
 class VariationalGaussianProcess(Surrogate):

@@ -15,10 +15,12 @@
 """Implementation of a heteroskedastic Gaussian process models using GPFlow."""
 
 import logging
-from typing import TYPE_CHECKING
 
+import gpflow as gpf
 import numpy as np
+import tensorflow as tf
 import tensorflow_probability as tfp
+import tf_keras as keras
 from sklearn.cluster import KMeans
 
 from queens.models.surrogates._surrogate import Surrogate
@@ -27,20 +29,8 @@ from queens.utils.logger_settings import log_init_args
 
 _logger = logging.getLogger(__name__)
 
-# This allows autocomplete in the IDE
-if TYPE_CHECKING:
-    import gpflow as gpf
-    import tensorflow as tf
-    import tf_keras as keras
-else:
-    from queens.utils.imports import LazyLoader
-
-    tf = LazyLoader("tensorflow")
-    keras = LazyLoader("tf_keras")
-    gpf = LazyLoader("gpflow")
-
-    configure_tensorflow(tf)
-    configure_keras(keras)
+configure_tensorflow(tf)
+configure_keras(keras)
 
 
 class HeteroskedasticGaussianProcess(Surrogate):

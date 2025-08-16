@@ -15,9 +15,10 @@
 """Gaussian process implementation in GPFlow."""
 
 import logging
-from typing import TYPE_CHECKING
 
+import gpflow as gpf
 import numpy as np
+import tensorflow as tf
 import tensorflow_probability as tfp
 
 from queens.models.surrogates._surrogate import Surrogate
@@ -28,17 +29,7 @@ from queens.utils.numpy_array import extract_block_diag
 
 _logger = logging.getLogger(__name__)
 
-# This allows autocomplete in the IDE
-if TYPE_CHECKING:
-    import gpflow as gpf
-    import tensorflow as tf
-else:
-    from queens.utils.imports import LazyLoader
-
-    tf = LazyLoader("tensorflow")
-    gpf = LazyLoader("gpflow")
-
-    configure_tensorflow(tf)
+configure_tensorflow(tf)
 
 
 class GaussianProcess(Surrogate):

@@ -15,10 +15,11 @@
 """Implementation of a Bayesian Neural Network."""
 
 import logging
-from typing import TYPE_CHECKING
 
 import numpy as np
+import tensorflow as tf
 import tensorflow_probability as tfp
+import tf_keras as keras
 
 from queens.models.surrogates._surrogate import Surrogate
 from queens.utils.configure_tensorflow import configure_keras, configure_tensorflow
@@ -29,18 +30,8 @@ _logger = logging.getLogger(__name__)
 tfd = tfp.distributions
 DenseVar = tfp.layers.DenseVariational
 
-# This allows autocomplete in the IDE
-if TYPE_CHECKING:
-    import tensorflow as tf
-    import tf_keras as keras
-else:
-    from queens.utils.imports import LazyLoader
-
-    tf = LazyLoader("tensorflow")
-    keras = LazyLoader("tf_keras")
-
-    configure_tensorflow(tf)
-    configure_keras(keras)
+configure_tensorflow(tf)
+configure_keras(keras)
 
 
 class GaussianBayesianNeuralNetwork(Surrogate):

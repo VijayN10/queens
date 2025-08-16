@@ -16,8 +16,19 @@
 
 Modules for extracting and processing data from simulation output files.
 """
+from typing import TYPE_CHECKING
 
-from queens.data_processors.csv_file import CsvFile
-from queens.data_processors.numpy_file import NumpyFile
-from queens.data_processors.pvd_file import PvdFile
-from queens.data_processors.txt_file import TxtFile
+from queens.utils.imports import extract_type_checking_imports, import_class_from_class_module_map
+
+if TYPE_CHECKING:
+    from queens.data_processors.csv_file import CsvFile
+    from queens.data_processors.numpy_file import NumpyFile
+    from queens.data_processors.pvd_file import PvdFile
+    from queens.data_processors.txt_file import TxtFile
+
+
+class_module_map = extract_type_checking_imports(__file__)
+
+
+def __getattr__(name):
+    return import_class_from_class_module_map(name, class_module_map, __name__)

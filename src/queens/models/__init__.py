@@ -17,17 +17,30 @@
 Modules for multi-query mapping of inputs to outputs, such as parameter
 samples to model evaluations.
 """
+from typing import TYPE_CHECKING
 
-from queens.models.adjoint import Adjoint
-from queens.models.bmfmc import BMFMC
-from queens.models.finite_difference import FiniteDifference
-from queens.models.likelihoods.bmf_gaussian import BMFGaussian, BmfiaInterface
-from queens.models.likelihoods.gaussian import Gaussian
-from queens.models.reinforcement_learning.reinforcement_learning import ReinforcementLearning
-from queens.models.simulation import Simulation
-from queens.models.surrogates.bayesian_neural_network import GaussianBayesianNeuralNetwork
-from queens.models.surrogates.gaussian_neural_network import GaussianNeuralNetwork
-from queens.models.surrogates.gaussian_process import GaussianProcess
-from queens.models.surrogates.heteroskedastic_gaussian_process import HeteroskedasticGaussianProcess
-from queens.models.surrogates.jitted_gaussian_process import JittedGaussianProcess
-from queens.models.surrogates.variational_gaussian_process import VariationalGaussianProcess
+from queens.utils.imports import extract_type_checking_imports, import_class_from_class_module_map
+
+if TYPE_CHECKING:
+    from queens.models.adjoint import Adjoint
+    from queens.models.bmfmc import BMFMC
+    from queens.models.finite_difference import FiniteDifference
+    from queens.models.likelihoods.bmf_gaussian import BMFGaussian, BmfiaInterface
+    from queens.models.likelihoods.gaussian import Gaussian
+    from queens.models.reinforcement_learning.reinforcement_learning import ReinforcementLearning
+    from queens.models.simulation import Simulation
+    from queens.models.surrogates.bayesian_neural_network import GaussianBayesianNeuralNetwork
+    from queens.models.surrogates.gaussian_neural_network import GaussianNeuralNetwork
+    from queens.models.surrogates.gaussian_process import GaussianProcess
+    from queens.models.surrogates.heteroskedastic_gaussian_process import (
+        HeteroskedasticGaussianProcess,
+    )
+    from queens.models.surrogates.jitted_gaussian_process import JittedGaussianProcess
+    from queens.models.surrogates.variational_gaussian_process import VariationalGaussianProcess
+
+
+class_module_map = extract_type_checking_imports(__file__)
+
+
+def __getattr__(name):
+    return import_class_from_class_module_map(name, class_module_map, __name__)

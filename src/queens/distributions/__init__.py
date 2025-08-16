@@ -16,16 +16,27 @@
 
 Modules for probability distributions.
 """
+from typing import TYPE_CHECKING
 
-from queens.distributions.bernoulli import Bernoulli
-from queens.distributions.beta import Beta
-from queens.distributions.categorical import Categorical
-from queens.distributions.exponential import Exponential
-from queens.distributions.free_variable import FreeVariable
-from queens.distributions.lognormal import LogNormal
-from queens.distributions.mean_field_normal import MeanFieldNormal
-from queens.distributions.multinomial import Multinomial
-from queens.distributions.normal import Normal
-from queens.distributions.particle import Particle
-from queens.distributions.uniform import Uniform
-from queens.distributions.uniform_discrete import UniformDiscrete
+from queens.utils.imports import extract_type_checking_imports, import_class_from_class_module_map
+
+if TYPE_CHECKING:
+    from queens.distributions.bernoulli import Bernoulli
+    from queens.distributions.beta import Beta
+    from queens.distributions.categorical import Categorical
+    from queens.distributions.exponential import Exponential
+    from queens.distributions.free_variable import FreeVariable
+    from queens.distributions.lognormal import LogNormal
+    from queens.distributions.mean_field_normal import MeanFieldNormal
+    from queens.distributions.multinomial import Multinomial
+    from queens.distributions.normal import Normal
+    from queens.distributions.particle import Particle
+    from queens.distributions.uniform import Uniform
+    from queens.distributions.uniform_discrete import UniformDiscrete
+
+
+class_module_map = extract_type_checking_imports(__file__)
+
+
+def __getattr__(name):
+    return import_class_from_class_module_map(name, class_module_map, __name__)

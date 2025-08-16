@@ -16,6 +16,7 @@
 
 import importlib.util
 import logging
+import re
 import sys
 from pathlib import Path
 
@@ -93,31 +94,60 @@ def get_module_class(module_options, valid_types, module_type_specifier="type"):
     return module_class
 
 
-class LazyLoader:
-    """Lazy loader for modules that take long to load.
+def import_class_from_class_module_map(name, class_module_map, package=None):
+    """Import class from class_module_map.
 
-    Inspired from https://stackoverflow.com/a/78312617
+    Args:
+        name (str): Name of the class.
+        class_module_map (dict): Class to module mapping.
+        package (str, opt): Package name (only necessary if import path is relative)
+
+    Returns:
+        class (obj): Class object.
     """
+    if name in class_module_map:
+        module = importlib.import_module(class_module_map[name], package=package)
+        return getattr(module, name)
+    raise AttributeError
 
-    def __init__(self, module_name):
-        """Initialize the loader.
 
-        Args:
-            module_name (str): name of the module to be imported
-        """
-        self._module_name = module_name
-        self._module = None
+def extract_type_checking_imports(file_path):
+    """Extract imports inside TYPE_CHECKING blocks from file.
 
-    def __getattr__(self, attr):
-        """Get attribute.
+    Args:
+        file_path (str): Path to the file
 
-        Args:
-            attr (str): Attribute name
+    Returns:
+        mapping (dict): A dict mapping class names to their source modules.
+    """
+    inside_type_checking = False
 
-        Returns:
-            obj: attribute
-        """
-        if self._module is None:
-            self._module = importlib.import_module(self._module_name)
+    with open(file_path, "r", encoding="utf-8") as file:
+        import_text = ""
 
-        return getattr(self._module, attr)
+        for line in file:
+            stripped_line = line.partition("#")[0]  # remove comments from line
+            stripped_line = stripped_line.strip()
+
+            # Detect start of TYPE_CHECKING block
+            if stripped_line.replace(" ", "") == "ifTYPE_CHECKING:":
+                inside_type_checking = True
+                continue
+
+            if inside_type_checking:
+                # Detect end of block (naively assumes dedent)
+                if len(line.lstrip()) == len(line):
+                    inside_type_checking = False
+                    continue
+                import_text += stripped_line
+
+        mapping = {}
+        import_statements = import_text.split("from")[1:]
+        for import_statement in import_statements:
+            module, class_names = import_statement.split("import")
+            module = module.strip()
+            class_names = class_names.split(",")
+            for class_name in class_names:
+                mapping[re.sub(r"\W+", "", class_name)] = module
+
+    return mapping
