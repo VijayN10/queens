@@ -3,10 +3,12 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="doc/source/images/queens_logo_night.svg">
   <source media="(prefers-color-scheme: light)" srcset="doc/source/images/queens_logo_day.svg">
-  <img alt="QUEENS logo" src="doc/source/images/queens_logo_night.svg" width="300">
+  <img alt="QUEENS logo" src="doc/source/images/queens_logo_night.svg">
 </picture>
 
 </div>
+
+<br>
 
 <div align="center">
 
