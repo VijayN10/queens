@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 Simplified surrogate data generation using OpenFOAM + probe values.
-Based on existing test_openfoam_driver.py structure.
 """
 
 import sys
 import numpy as np
 from pathlib import Path
 import pickle
+
 # Add the queens src directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / 'src'))
 
@@ -19,14 +19,13 @@ from queens.models import Simulation
 from queens.iterators import MonteCarlo
 from queens.global_settings import GlobalSettings
 from queens.main import run_iterator
-from queens.data_processors.paraview import DataProcessorParaviewSubprocess
+from queens.data_processors.paraview import DataProcessorParaview
 
 
 def generate_training_data(num_samples=5):
-    """Generate training data using OpenFOAM + DataProcessorParaviewSubprocess."""
-
-    # Create output directory if it doesn't exist
-    from pathlib import Path
+    """Generate training data using OpenFOAM + DataProcessorParaview."""
+    
+    # Create output directory
     Path("./surrogate_data").mkdir(exist_ok=True)    
 
     global_settings = GlobalSettings(
@@ -35,19 +34,19 @@ def generate_training_data(num_samples=5):
     )
     
     with global_settings:
-        # Simple parameter ranges
+        # Parameter ranges
         parameters = Parameters(
             lid_velocity=Uniform(lower_bound=0.5, upper_bound=2.0),
             initial_pressure=Uniform(lower_bound=-0.1, upper_bound=0.1),
         )
         
         # Data processor for probe extraction
-        data_processor = DataProcessorParaviewSubprocess(
-            probe_locations=[(0.05, 0.05, 0.005), (0.01, 0.01, 0.005), (0.09, 0.09, 0.005)],
+        data_processor = DataProcessorParaview(
+            probe_locations=[(0.05, 0.05, 0.005), (0.02, 0.02, 0.005), (0.08, 0.08, 0.005)],
             data_fields=['U', 'p']
         )
         
-        # OpenFOAM driver with data processor
+        # OpenFOAM driver
         openfoam_driver = OpenFoam(
             parameters=parameters,
             case_template_dir="./cavity_template",
@@ -55,7 +54,7 @@ def generate_training_data(num_samples=5):
             parallel=False,
             num_procs=1,
             openfoam_bashrc="/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/openfoam-org-9-yjq7t3b3xh75m5s7u5bntedww5u7sekn/etc/bashrc",
-            data_processor=data_processor  # Pass data processor to driver
+            data_processor=data_processor
         )
         
         scheduler = Pool(
@@ -64,7 +63,6 @@ def generate_training_data(num_samples=5):
             verbose=True
         )
         
-        # Simulation model without data processor
         model = Simulation(
             scheduler=scheduler,
             driver=openfoam_driver
@@ -90,44 +88,57 @@ def generate_training_data(num_samples=5):
 
 def extract_processed_data(global_settings):
     """Extract processed probe data from QUEENS results."""
+    from queens.utils.io import load_result
     
-    output_dir = Path(global_settings.output_dir) / global_settings.experiment_name
+    results_file = Path(global_settings.output_dir) / global_settings.experiment_name / "results.json"
     
-    # Load results from QUEENS output
-    results_file = output_dir / "results.json"  # or results.pkl
-    if results_file.exists():
-        if results_file.suffix == '.json':
-            import json
-            with open(results_file, 'r') as f:
-                data = json.load(f)
-        else:
-            with open(results_file, 'rb') as f:
-                data = pickle.load(f)
-        
-        # Extract parameters and results
-        X_train = np.array([sample['parameters'] for sample in data])
-        y_train = np.array([sample['results'] for sample in data])
-    else:
+    if not results_file.exists():
         print(f"Warning: Results file not found at {results_file}")
         return np.array([]), np.array([])
     
-    # Save dataset
-    np.save("X_train.npy", X_train)
-    np.save("y_train.npy", y_train)
-    
-    print(f"✅ Saved {len(X_train)} samples")
-    return X_train, y_train
-
-
-def extract_final_probe_value(probe_file):
-    """Helper function kept for compatibility."""
-    return [0]  # Not needed with DataProcessorParaviewSubprocess
+    try:
+        results = load_result(results_file)
+        
+        X_data = []
+        y_data = []
+        
+        if hasattr(results, 'output_dict') and results.output_dict:
+            for sample_data in results.output_dict.values():
+                if 'parameters' in sample_data and 'model_response' in sample_data:
+                    # Parameters (lid_velocity, initial_pressure)
+                    params = sample_data['parameters']
+                    X_data.append([params.get('lid_velocity', 0), params.get('initial_pressure', 0)])
+                    
+                    # Probe data response
+                    response = sample_data['model_response']
+                    if isinstance(response, np.ndarray) and len(response) > 0:
+                        y_data.append(response)
+                    else:
+                        y_data.append(np.zeros(12))  # 3 probes × (3 U + 1 p) = 12
+        
+        X_train = np.array(X_data)
+        y_train = np.array(y_data)
+        
+        print(f"Training data shape:")
+        print(f"  X (lid_velocity, pressure): {X_train.shape}")
+        print(f"  y (velocity_mag, pressure):  {y_train.shape}")
+        
+        return X_train, y_train
+        
+    except Exception as e:
+        print(f"Error loading results: {e}")
+        return np.array([]), np.array([])
 
 
 if __name__ == "__main__":
-    # Generate simple training data
-    X_train, y_train = generate_training_data(num_samples=5)
+    X, y = generate_training_data(5)
     
-    print(f"Training data shape:")
-    print(f"  X (lid_velocity, pressure): {X_train.shape}")
-    print(f"  y (velocity_mag, pressure):  {y_train.shape}")
+    # Save training data
+    output_file = "surrogate_training_data.pkl"
+    with open(output_file, 'wb') as f:
+        pickle.dump({'X': X, 'y': y}, f)
+    
+    print(f"\n✅ Training data saved to {output_file}")
+    if len(X) > 0:
+        print(f"Sample X: {X[0]}")
+        print(f"Sample y: {y[0]}")
