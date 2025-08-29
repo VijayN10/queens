@@ -1,24 +1,19 @@
-#
-# SPDX-License-Identifier: LGPL-3.0-or-later
-# Copyright (c) 2024-2025, QUEENS contributors.
-#
-# This file is part of QUEENS.
-#
-# QUEENS is free software: you can redistribute it and/or modify it under the terms of the GNU
-# Lesser General Public License as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version. QUEENS is distributed in the hope that it will
-# be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You
-# should have received a copy of the GNU Lesser General Public License along with QUEENS. If not,
-# see <https://www.gnu.org/licenses/>.
-#
-"""Driver to run OpenFOAM simulations."""
+# File: src/queens/drivers/openfoam.py
+"""
+Fixed OpenFOAM driver that properly integrates data processors.
+
+The issue was that the base Jobscript class passes output_dir (job_dir/output/) 
+to the data processor, but ParaView needs to process the case directory (job_dir/).
+"""
 
 import re
+import logging
 from pathlib import Path
 
 from queens.drivers.jobscript import Jobscript
 from queens.utils.logger_settings import log_init_args
+
+_logger = logging.getLogger(__name__)
 
 _JOBSCRIPT_TEMPLATE_CONTAINER = """
 #!/bin/bash
@@ -89,7 +84,7 @@ echo "OpenFOAM simulation completed!"
 
 
 class OpenFoam(Jobscript):
-    """Driver to run OpenFOAM simulations."""
+    """Fixed OpenFOAM driver with proper data processor integration."""
 
     @log_init_args
     def __init__(
@@ -142,7 +137,6 @@ class OpenFoam(Jobscript):
             extra_options=extra_options,
         )
 
-
     def run(self, sample, job_id, num_procs, experiment_dir, experiment_name):
         """Override run to copy static files and set correct case directory."""
         # Get job directory path  
@@ -167,7 +161,36 @@ class OpenFoam(Jobscript):
             if original_case_dir is not None:
                 self.jobscript_options["case_dir"] = original_case_dir
 
+    def _get_results(self, output_dir):
+        """Override to pass the correct directory to data processors.
+        
+        CRITICAL FIX: The parent class passes output_dir (job_dir/output/) to data processors,
+        but OpenFOAM data processors need the case directory (job_dir/).
+        
+        Args:
+            output_dir (Path): Path to output directory (job_dir/output/)
+            
+        Returns:
+            result (np.array): Result from the driver run.
+            gradient (np.array, None): Gradient from the driver run (potentially None).
+        """
+        result = None
+        gradient = None
+        
+        # Get the case directory (parent of output_dir)
+        case_dir = output_dir.parent
+        
+        if self.data_processor:
+            # Pass case_dir instead of output_dir for OpenFOAM data processors
+            result = self.data_processor.get_data_from_file(case_dir)
+            _logger.debug("Got result from case_dir %s: %s", case_dir, result)
 
+        if self.gradient_data_processor:
+            # Pass case_dir instead of output_dir for OpenFOAM gradient processors
+            gradient = self.gradient_data_processor.get_data_from_file(case_dir)
+            _logger.debug("Got gradient from case_dir %s: %s", case_dir, gradient)
+            
+        return result, gradient
 
     def _copy_static_files_to_job_dir(self, job_dir):
         """Copy all non-template files to the job directory."""
@@ -257,222 +280,3 @@ class OpenFoam(Jobscript):
             input_files[input_template_name] = output_file_path
 
         return job_dir, output_dir, output_file, input_files, log_file
-
-
-class OpenFoamLogProcessor:
-    """Data processor to extract results from OpenFOAM log files."""
-    
-    def __init__(self, log_file_pattern="log.*"):
-        """Initialize the log processor.
-        
-        Args:
-            log_file_pattern (str): Pattern to match log files
-        """
-        self.log_file_pattern = log_file_pattern
-    
-    def __call__(self, job_options):
-        """Process OpenFOAM simulation results.
-        
-        Args:
-            job_options: Job options containing output directory
-            
-        Returns:
-            dict: Dictionary containing extracted results
-        """
-        results = {}
-        output_dir = Path(job_options.output_dir)
-        
-        # Find log files
-        log_files = list(output_dir.glob(self.log_file_pattern))
-        if not log_files:
-            case_dir = output_dir.parent
-            log_files = list(case_dir.glob(self.log_file_pattern))
-        
-        if log_files:
-            log_file = log_files[0]
-            
-            with open(log_file, 'r') as f:
-                content = f.read()
-            
-            results['residuals'] = self._extract_residuals(content)
-            results['converged'] = 'End' in content or 'SIMPLE solution converged' in content
-            
-            # Extract execution time
-            time_match = re.search(r'ExecutionTime = ([\d.]+) s', content)
-            if time_match:
-                results['execution_time'] = float(time_match.group(1))
-        
-        return results
-    
-    def _extract_residuals(self, content):
-        """Extract residual data from log content.
-        
-        Args:
-            content (str): Log file content
-            
-        Returns:
-            dict: Dictionary containing residual data
-        """
-        residuals = {}
-        
-        residual_patterns = {
-            'p': r'Solving for p, Initial residual = ([\d.e-]+)',
-            'Ux': r'Solving for Ux, Initial residual = ([\d.e-]+)',
-            'Uy': r'Solving for Uy, Initial residual = ([\d.e-]+)',
-            'Uz': r'Solving for Uz, Initial residual = ([\d.e-]+)',
-        }
-        
-        for field, pattern in residual_patterns.items():
-            matches = re.findall(pattern, content)
-            if matches:
-                residuals[field] = [float(m) for m in matches]
-                residuals[f'{field}_final'] = float(matches[-1])
-        
-        return residuals
-
-
-class OpenFoamFieldProcessor:
-    """Data processor to extract field data from OpenFOAM results."""
-    
-    def __init__(self, fields=None, time_dirs=None):
-        """Initialize the field processor.
-        
-        Args:
-            fields (list): List of field names to extract (e.g., ['p', 'U'])
-            time_dirs (list): List of time directories to process (e.g., ['0', '1', 'latest'])
-        """
-        self.fields = fields or ['p', 'U']
-        self.time_dirs = time_dirs or ['latest']
-    
-    def __call__(self, job_options):
-        """Process OpenFOAM field results.
-        
-        Args:
-            job_options: Job options containing output directory
-            
-        Returns:
-            dict: Dictionary containing extracted field data
-        """
-        results = {}
-        case_dir = Path(job_options.output_dir).parent
-        
-        # Find time directories
-        time_directories = self._find_time_directories(case_dir)
-        
-        for time_dir in time_directories:
-            if 'latest' in self.time_dirs or time_dir.name in self.time_dirs:
-                time_results = {}
-                
-                for field in self.fields:
-                    field_file = time_dir / field
-                    if field_file.exists():
-                        time_results[field] = self._extract_field_statistics(field_file)
-                
-                results[f'time_{time_dir.name}'] = time_results
-        
-        return results
-    
-    def _find_time_directories(self, case_dir):
-        """Find time directories in the case.
-        
-        Args:
-            case_dir (Path): Path to OpenFOAM case directory
-            
-        Returns:
-            list: List of time directory paths
-        """
-        time_dirs = []
-        for item in case_dir.iterdir():
-            if item.is_dir():
-                try:
-                    # Check if directory name can be converted to float (time directories)
-                    float(item.name)
-                    time_dirs.append(item)
-                except ValueError:
-                    # Not a time directory
-                    continue
-        
-        # Sort by time value
-        time_dirs.sort(key=lambda x: float(x.name))
-        return time_dirs
-    
-    def _extract_field_statistics(self, field_file):
-        """Extract basic statistics from a field file.
-        
-        Args:
-            field_file (Path): Path to OpenFOAM field file
-            
-        Returns:
-            dict: Dictionary containing field statistics
-        """
-        try:
-            with open(field_file, 'r') as f:
-                content = f.read()
-            
-            # Extract internal field values (simplified parsing)
-            internal_field_match = re.search(r'internalField\s+uniform\s+([\d.e-]+)', content)
-            if internal_field_match:
-                return {
-                    'uniform_value': float(internal_field_match.group(1)),
-                    'type': 'uniform'
-                }
-            
-            # For non-uniform fields, could add more sophisticated parsing
-            return {'type': 'non-uniform', 'parsed': False}
-            
-        except Exception as e:
-            return {'error': str(e), 'parsed': False}
-
-
-class OpenFoamResidualProcessor:
-    """Specialized data processor for monitoring OpenFOAM convergence."""
-    
-    def __init__(self, target_residual=1e-6, max_iterations=None):
-        """Initialize the residual processor.
-        
-        Args:
-            target_residual (float): Target residual for convergence
-            max_iterations (int): Maximum number of iterations to consider
-        """
-        self.target_residual = target_residual
-        self.max_iterations = max_iterations
-    
-    def __call__(self, job_options):
-        """Process OpenFOAM residual data.
-        
-        Args:
-            job_options: Job options containing output directory
-            
-        Returns:
-            dict: Dictionary containing convergence analysis
-        """
-        log_processor = OpenFoamLogProcessor()
-        log_results = log_processor(job_options)
-        
-        if 'residuals' not in log_results:
-            return {'convergence_analysis': 'No residual data found'}
-        
-        residuals = log_results['residuals']
-        analysis = {}
-        
-        for field, values in residuals.items():
-            if isinstance(values, list) and len(values) > 0:
-                analysis[field] = {
-                    'initial': values[0],
-                    'final': values[-1],
-                    'converged': values[-1] < self.target_residual,
-                    'iterations': len(values),
-                    'reduction_factor': values[0] / values[-1] if values[-1] > 0 else float('inf')
-                }
-        
-        # Overall convergence assessment
-        converged_fields = [field for field, data in analysis.items() 
-                          if isinstance(data, dict) and data.get('converged', False)]
-        
-        analysis['overall'] = {
-            'converged': len(converged_fields) == len([k for k in analysis.keys() if k != 'overall']),
-            'converged_fields': converged_fields,
-            'target_residual': self.target_residual
-        }
-        
-        return analysis
