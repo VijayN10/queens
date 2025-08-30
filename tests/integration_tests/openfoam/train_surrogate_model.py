@@ -7,12 +7,12 @@ import sys
 import os
 from pathlib import Path
 
-# Fix the Python path - add QUEENS source directory properly
+# Add QUEENS source directory to Python path
 queens_src_path = Path('/home/a11evina/queens/src').resolve()
 if str(queens_src_path) not in sys.path:
     sys.path.insert(0, str(queens_src_path))
 
-# Now import QUEENS modules
+# Import QUEENS modules
 try:
     from queens.models.surrogates.gaussian_process import GaussianProcess
     from queens.distributions import Uniform
@@ -32,7 +32,7 @@ def train_and_save_surrogate():
     
     # Load the generated training data
     try:
-        with open("combined_output/openfoam_paraview_fixed_surrogate_data.pkl", "rb") as f:
+        with open("surrogate_data_output/cavity_flow_surrogate_surrogate_data.pkl", "rb") as f:
             data = pickle.load(f)
         print("✅ Training data loaded successfully")
     except FileNotFoundError:
@@ -49,12 +49,12 @@ def train_and_save_surrogate():
     # Set up QUEENS for surrogate modeling
     try:
         global_settings = GlobalSettings(
-            experiment_name="cavity_surrogate",
-            output_dir="./surrogate_output"
+            experiment_name="cavity_surrogate_training",
+            output_dir="./trained_models"
         )
         
         with global_settings:
-            # Define parameter space (same as training)
+            # Define parameter space (same as training data)
             parameters = Parameters(
                 lid_velocity=Uniform(lower_bound=0.5, upper_bound=2.0),
                 initial_pressure=Uniform(lower_bound=-0.1, upper_bound=0.1),
@@ -78,8 +78,8 @@ def train_and_save_surrogate():
             print("✅ Surrogate model trained")
             
             # Save the trained model
-            model_save_path = "surrogate_output/trained_surrogate_model.pkl"
-            os.makedirs("surrogate_output", exist_ok=True)
+            model_save_path = "trained_models/cavity_surrogate_model.pkl"
+            os.makedirs("trained_models", exist_ok=True)
             
             # Create a save dictionary with model and metadata
             save_data = {
@@ -92,7 +92,7 @@ def train_and_save_surrogate():
                     'max': X_train.max(axis=0).tolist()
                 },
                 'metadata': {
-                    'experiment_name': 'cavity_surrogate',
+                    'experiment_name': 'cavity_surrogate_training',
                     'model_type': 'GaussianProcess',
                     'trained_on': str(Path.cwd()),
                 }
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     if saved_model_path:
         print(f"\n🎉 SUCCESS!")
         print(f"Trained model saved to: {saved_model_path}")
-        print("\nNext step: Use predict_surrogate_model.py to make predictions")
+        print("\nNext step: Use prediction script to make predictions")
     else:
         print("\n❌ FAILED to train and save model")
         sys.exit(1)

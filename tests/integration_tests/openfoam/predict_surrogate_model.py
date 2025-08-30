@@ -6,7 +6,7 @@ import numpy as np
 import sys
 from pathlib import Path
 
-# Fix the Python path - add QUEENS source directory properly
+# Add QUEENS source directory to Python path
 queens_src_path = Path('/home/a11evina/queens/src').resolve()
 if str(queens_src_path) not in sys.path:
     sys.path.insert(0, str(queens_src_path))
@@ -15,7 +15,7 @@ def load_and_predict():
     """Load trained surrogate model and make predictions."""
     
     # Load the trained model
-    model_path = "surrogate_output/trained_surrogate_model.pkl"
+    model_path = "trained_models/cavity_surrogate_model.pkl"
     
     try:
         with open(model_path, 'rb') as f:
@@ -23,7 +23,7 @@ def load_and_predict():
         print("✅ Trained model loaded successfully")
     except FileNotFoundError:
         print(f"❌ Model file not found: {model_path}")
-        print("Make sure you've run train_surrogate_model.py first")
+        print("Make sure you've run the training script first")
         sys.exit(1)
     except Exception as e:
         print(f"❌ Error loading model: {e}")
@@ -86,7 +86,7 @@ def load_and_predict():
 def interactive_prediction():
     """Allow user to input custom test points."""
     
-    model_path = "surrogate_output/trained_surrogate_model.pkl"
+    model_path = "trained_models/cavity_surrogate_model.pkl"
     
     try:
         with open(model_path, 'rb') as f:
