@@ -62,6 +62,8 @@ def create_combined_openfoam_paraview_workflow():
             probe_locations=[
                 (0.05, 0.05, 0.005),  # center
                 (0.01, 0.01, 0.005),  # bottom_left
+                (0.09, 0.01, 0.005),  # bottom_right
+                (0.01, 0.09, 0.005),  # top_left
                 (0.09, 0.09, 0.005),  # top_right
             ],
             data_fields=['U', 'p'],
@@ -99,7 +101,7 @@ def create_combined_openfoam_paraview_workflow():
             model=model,
             parameters=parameters,
             global_settings=global_settings,
-            num_samples=5,
+            num_samples=20,
             seed=42,
             result_description={"write_results": True, "plot_results": False},
         )
@@ -185,6 +187,8 @@ def analyze_results(global_settings):
                     'probe_locations': [
                         (0.05, 0.05, 0.005),  # center
                         (0.01, 0.01, 0.005),  # bottom_left
+                        (0.09, 0.01, 0.005),  # bottom_right
+                        (0.01, 0.09, 0.005),  # top_left
                         (0.09, 0.09, 0.005),  # top_right
                     ],
                     'fields': ['Ux', 'Uy', 'Uz', 'p'],

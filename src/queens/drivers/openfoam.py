@@ -1,9 +1,9 @@
 # File: src/queens/drivers/openfoam.py
 """
-Fixed OpenFOAM driver that properly integrates data processors.
+OpenFOAM driver that properly integrates data processors with QUEENS.
 
-The issue was that the base Jobscript class passes output_dir (job_dir/output/) 
-to the data processor, but ParaView needs to process the case directory (job_dir/).
+This driver correctly passes the case directory to data processors,
+enabling proper post-processing of simulation results.
 """
 
 import re
@@ -84,7 +84,7 @@ echo "OpenFOAM simulation completed!"
 
 
 class OpenFoam(Jobscript):
-    """Fixed OpenFOAM driver with proper data processor integration."""
+    """OpenFOAM driver with proper data processor integration."""
 
     @log_init_args
     def __init__(
@@ -125,13 +125,13 @@ class OpenFoam(Jobscript):
             "log_file": f"log.{solver}"
         }
 
-        # Don't use files_to_copy for static files - we'll handle them in run()
+        # Only copy user-specified files - static files handled in run()
         super().__init__(
             parameters=parameters,
             input_templates=input_templates,
             jobscript_template=jobscript_template,
             executable=solver,
-            files_to_copy=files_to_copy or [],  # Only user-specified files
+            files_to_copy=files_to_copy or [],
             data_processor=data_processor,
             gradient_data_processor=gradient_data_processor,
             extra_options=extra_options,
@@ -164,7 +164,7 @@ class OpenFoam(Jobscript):
     def _get_results(self, output_dir):
         """Override to pass the correct directory to data processors.
         
-        CRITICAL FIX: The parent class passes output_dir (job_dir/output/) to data processors,
+        The parent class passes output_dir (job_dir/output/) to data processors,
         but OpenFOAM data processors need the case directory (job_dir/).
         
         Args:

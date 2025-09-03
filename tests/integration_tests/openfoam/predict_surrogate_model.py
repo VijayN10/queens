@@ -63,8 +63,8 @@ def load_and_predict():
         
         for i, (x_test, y_pred, y_std) in enumerate(zip(X_test, Y_pred, Y_std)):
             print(f"\nTest point {i+1}: [vel={x_test[0]:.2f}, p={x_test[1]:.3f}]")
-            print(f"  Predictions (12 probes): {y_pred}")
-            print(f"  Uncertainties (12 probes): {y_std}")
+            print(f"  Predictions: {y_pred}")
+            print(f"  Uncertainties: {y_std}")
             print(f"  Mean prediction: {y_pred.mean():.4f} ± {y_std.mean():.4f}")
             print(f"  Max prediction: {y_pred.max():.4f}")
             print(f"  Min prediction: {y_pred.min():.4f}")

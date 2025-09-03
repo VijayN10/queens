@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-ParaView DataProcessor with embedded processing logic - no external scripts needed
+ParaView DataProcessor with embedded processing logic for QUEENS.
+Extracts probe data from OpenFOAM simulations using ParaView.
 """
 
 import logging
@@ -67,7 +68,7 @@ class DataProcessorParaview(DataProcessor):
         self.data_fields = data_fields
 
     def get_data_from_file(self, base_dir_file):
-        """Override to work directly with case directories."""
+        """Process data from OpenFOAM case directory."""
         if not isinstance(base_dir_file, Path):
             base_dir_file = Path(base_dir_file)
         
@@ -107,7 +108,7 @@ class DataProcessorParaview(DataProcessor):
             )
             
             if result.returncode != 0:
-                _logger.error(f"ParaView failed: {result.stderr}")
+                _logger.error(f"ParaView processing failed: {result.stderr}")
                 return np.array([])
                 
         except Exception as e:
@@ -121,7 +122,7 @@ class DataProcessorParaview(DataProcessor):
         return self._load_results(case_path)
     
     def _generate_paraview_script(self):
-        """Generate ParaView script content based on working script."""
+        """Generate ParaView script content for probe extraction."""
         script = f'''
 import sys
 import json
@@ -183,7 +184,7 @@ for i, coords in enumerate(probe_locations):
         probe = ProbeLocation(Input=reader)
         probe.ProbeType = 'Fixed Radius Point Source'
         probe.ProbeType.Center = list(coords)
-        probe.ProbeType.Radius = 0.001  # Small radius like working script
+        probe.ProbeType.Radius = 0.001
         probe.UpdatePipeline()
         
         probe_data = servermanager.Fetch(probe)
