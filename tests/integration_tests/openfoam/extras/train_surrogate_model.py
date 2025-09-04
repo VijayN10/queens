@@ -57,7 +57,7 @@ def train_and_save_surrogate():
             # Define parameter space (same as training data)
             parameters = Parameters(
                 lid_velocity=Uniform(lower_bound=0.5, upper_bound=2.0),
-                viscosity=Uniform(lower_bound=0.005, upper_bound=0.02),
+                initial_pressure=Uniform(lower_bound=-0.1, upper_bound=0.1),
             )
             
             print("✅ Parameters defined")

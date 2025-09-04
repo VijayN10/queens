@@ -42,11 +42,11 @@ def load_and_predict():
     
     # Define test points for prediction
     X_test = np.array([
-        [1.2, 0.01],   # Test point 1: [lid_velocity, viscosity]
-        [1.8, 0.015],  # Test point 2
-        [0.8, 0.008],  # Test point 3
-        [1.5, 0.012],  # Test point 4
-        [1.0, 0.01],   # Test point 5 (center)
+        [1.2, 0.05],   # Test point 1
+        [1.8, -0.02],  # Test point 2
+        [0.8, 0.08],   # Test point 3
+        [1.5, -0.05],  # Test point 4
+        [1.0, 0.0],    # Test point 5 (center)
     ])
     
     print(f"\n🔄 Making predictions on {len(X_test)} test points...")
@@ -62,7 +62,7 @@ def load_and_predict():
         print("="*70)
         
         for i, (x_test, y_pred, y_std) in enumerate(zip(X_test, Y_pred, Y_std)):
-            print(f"\nTest point {i+1}: [vel={x_test[0]:.2f}, nu={x_test[1]:.3f}]")
+            print(f"\nTest point {i+1}: [vel={x_test[0]:.2f}, p={x_test[1]:.3f}]")
             print(f"  Predictions: {y_pred}")
             print(f"  Uncertainties: {y_std}")
             print(f"  Mean prediction: {y_pred.mean():.4f} ± {y_std.mean():.4f}")
@@ -101,7 +101,7 @@ def interactive_prediction():
     print("="*50)
     print(f"Parameter ranges:")
     print(f"  lid_velocity: {param_ranges['min'][0]:.2f} to {param_ranges['max'][0]:.2f}")
-    print(f"  viscosity: {param_ranges['min'][1]:.3f} to {param_ranges['max'][1]:.3f}")
+    print(f"  initial_pressure: {param_ranges['min'][1]:.3f} to {param_ranges['max'][1]:.3f}")
     
     while True:
         try:
@@ -111,21 +111,21 @@ def interactive_prediction():
             if vel_input.lower() == 'quit':
                 break
             
-            visc_input = input("viscosity: ")
-            if visc_input.lower() == 'quit':
+            press_input = input("initial_pressure: ")
+            if press_input.lower() == 'quit':
                 break
             
             # Convert to float and create test point
             vel = float(vel_input)
-            visc = float(visc_input)
-            X_test = np.array([[vel, visc]])
+            press = float(press_input)
+            X_test = np.array([[vel, press]])
             
             # Make prediction
             prediction_dict = surrogate_model.predict(X_test)
             Y_pred = prediction_dict["result"]
             Y_std = np.sqrt(prediction_dict["variance"])
             
-            print(f"\nPrediction for [vel={vel:.2f}, nu={visc:.3f}]:")
+            print(f"\nPrediction for [vel={vel:.2f}, p={press:.3f}]:")
             print(f"  Mean prediction: {Y_pred.mean():.4f} ± {Y_std.mean():.4f}")
             print(f"  Probe predictions: {Y_pred[0]}")
             

@@ -50,7 +50,7 @@ def create_combined_openfoam_paraview_workflow():
         # Parameter definitions
         parameters = Parameters(
             lid_velocity=Uniform(lower_bound=0.5, upper_bound=2.0),
-            viscosity=Uniform(lower_bound=0.005, upper_bound=0.02),
+            initial_pressure=Uniform(lower_bound=-0.1, upper_bound=0.1),
         )
         print("✅ Parameters defined")
         
@@ -101,7 +101,7 @@ def create_combined_openfoam_paraview_workflow():
             model=model,
             parameters=parameters,
             global_settings=global_settings,
-            num_samples=40,
+            num_samples=20,
             seed=42,
             result_description={"write_results": True, "plot_results": False},
         )
@@ -161,13 +161,13 @@ def analyze_results(global_settings):
             print(f"raw_output_data structure: {type(results['raw_output_data'])}")
         
         # Extract X (parameters) and Y (probe outputs) for surrogate modeling
-        X = results[samples_key]  # n × 2 matrix [lid_velocity, viscosity]
+        X = results[samples_key]  # n × 2 matrix [lid_velocity, initial_pressure]
         
         if 'raw_output_data' in results and 'result' in results['raw_output_data']:
             Y = np.array(results['raw_output_data']['result'])
             
             print(f"✅ Successfully extracted data for surrogate modeling:")
-            print(f"   X (parameters): {X.shape} - [lid_velocity, viscosity]")
+            print(f"   X (parameters): {X.shape} - [lid_velocity, initial_pressure]")
             print(f"   Y (probe data): {Y.shape} - [probe0(Ux,Uy,Uz,p), probe1(...), probe2(...)]")
             
             # Check if we got valid data (not all zeros)
@@ -182,7 +182,7 @@ def analyze_results(global_settings):
             surrogate_data = {
                 'X_train': X,
                 'Y_train': Y,
-                'parameter_names': ['lid_velocity', 'viscosity'],
+                'parameter_names': ['lid_velocity', 'initial_pressure'],
                 'output_description': {
                     'probe_locations': [
                         (0.05, 0.05, 0.005),  # center
@@ -200,7 +200,7 @@ def analyze_results(global_settings):
                     'num_samples': len(X),
                     'parameter_ranges': {
                         'lid_velocity': [0.5, 2.0],
-                        'viscosity': [-0.1, 0.1]
+                        'initial_pressure': [-0.1, 0.1]
                     }
                 }
             }
@@ -219,7 +219,7 @@ def analyze_results(global_settings):
             print(f"\n📊 SAMPLE DATA PREVIEW:")
             for i in range(min(3, len(X))):
                 print(f"   Sample {i}:")
-                print(f"     Input:  lid_vel={X[i,0]:.3f}, visc={X[i,1]:.3f}")
+                print(f"     Input:  lid_vel={X[i,0]:.3f}, init_p={X[i,1]:.3f}")
                 if len(Y[i]) >= 12:
                     print(f"     Output: probe0=[{Y[i,0]:.4f},{Y[i,1]:.4f},{Y[i,2]:.4f},{Y[i,3]:.4f}], ...")
                 else:
@@ -229,7 +229,7 @@ def analyze_results(global_settings):
             print(f"\n📈 STATISTICAL SUMMARY:")
             print(f"   Parameter ranges:")
             print(f"     lid_velocity: [{X[:,0].min():.3f}, {X[:,0].max():.3f}] (mean: {X[:,0].mean():.3f})")
-            print(f"     viscosity: [{X[:,1].min():.3f}, {X[:,1].max():.3f}] (mean: {X[:,1].mean():.3f})")
+            print(f"     initial_pressure: [{X[:,1].min():.3f}, {X[:,1].max():.3f}] (mean: {X[:,1].mean():.3f})")
             print(f"   Output statistics:")
             print(f"     Mean: {np.mean(Y, axis=0)}")
             print(f"     Std:  {np.std(Y, axis=0)}")
