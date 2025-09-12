@@ -14,7 +14,8 @@ import math
 def load_ace_benchmark():
     """ACE Numerics benchmark data for Re=1000"""
     
-    # Vertical velocity along y=0.5 (Table 2)
+    # ACE VERTICAL BENCHMARK: v-velocity along horizontal line y=0.5 (Table 2)
+    # Format: (x_position, v_velocity) - sampling across x-direction at y=0.5
     ace_vertical = [
         [0.0000, 0.0000000], [0.0100, 0.0709203], [0.0200, 0.1306210], [0.0300, 0.1796062],
         [0.0400, 0.2189314], [0.0625, 0.2807056], [0.0703, 0.2962703], [0.0781, 0.3099097],
@@ -25,7 +26,8 @@ def load_ace_benchmark():
         [0.9900, -0.0617528], [0.9950, -0.0291290], [1.0000, 0.0000000]
     ]
     
-    # Horizontal velocity along x=0.5 (Table 4) 
+    # ACE HORIZONTAL BENCHMARK: u-velocity along vertical line x=0.5 (Table 4) 
+    # Format: (y_position, u_velocity) - sampling across y-direction at x=0.5
     ace_horizontal = [
         [0.0000, 0.0000000], [0.0100, -0.0397486], [0.0200, -0.0759628], [0.0300, -0.1090870],
         [0.0400, -0.1396601], [0.0547, -0.1812881], [0.0625, -0.2023300], [0.0703, -0.2228955],
@@ -83,11 +85,11 @@ def validate_results(validation_dir):
     
     print("📊 Loading OpenFOAM data...")
     
-    # Load vertical centerline
+    # Load vertical centerline (x=0.5, varying y)
     vertical_file = os.path.join(validation_dir, 'vertical_centerline_fixed.csv')
     vertical_data, v_headers = read_csv_file(vertical_file)
     
-    # Load horizontal centerline
+    # Load horizontal centerline (y=0.5, varying x)
     horizontal_file = os.path.join(validation_dir, 'horizontal_centerline_fixed.csv')
     horizontal_data, h_headers = read_csv_file(horizontal_file)
     
@@ -108,31 +110,32 @@ def validate_results(validation_dir):
     print("VALIDATION RESULTS - Re = 1000")
     print("="*60)
     
-    # ========== VERTICAL CENTERLINE VALIDATION ==========
+    # ========== VERTICAL CENTERLINE VALIDATION (CORRECTED) ==========
     print("\n📈 VERTICAL CENTERLINE VALIDATION (v-velocity along y=0.5)")
-    print("-" * 50)
+    print("Comparing ACE v-velocity at different x-positions along y=0.5 with OpenFOAM horizontal centerline")
+    print("-" * 80)
     
-    # Extract OpenFOAM vertical data (sorted by y-position)
-    foam_y = []
-    foam_v = []
-    for row in vertical_data:
-        y = float(row['Points:1'])  # y-coordinate
+    # Extract OpenFOAM horizontal centerline data (x-positions with v-velocity)
+    foam_x_horiz = []
+    foam_v_horiz = []
+    for row in horizontal_data:
+        x = float(row['Points:0'])  # x-coordinate
         v = float(row['U:1'])       # v-velocity
-        foam_y.append(y)
-        foam_v.append(v)
+        foam_x_horiz.append(x)
+        foam_v_horiz.append(v)
     
-    # Sort by y-coordinate
-    sorted_indices = sorted(range(len(foam_y)), key=lambda k: foam_y[k])
-    foam_y_sorted = [foam_y[i] for i in sorted_indices]
-    foam_v_sorted = [foam_v[i] for i in sorted_indices]
+    # Sort by x-coordinate
+    sorted_indices_h = sorted(range(len(foam_x_horiz)), key=lambda k: foam_x_horiz[k])
+    foam_x_horiz_sorted = [foam_x_horiz[i] for i in sorted_indices_h]
+    foam_v_horiz_sorted = [foam_v_horiz[i] for i in sorted_indices_h]
     
-    # Compare with benchmark at key points
+    # Compare with ACE vertical benchmark
     v_errors = []
     print(f"{'x':<8} {'ACE v':<12} {'OpenFOAM v':<12} {'Error':<12} {'% Error'}")
-    print("-" * 50)
+    print("-" * 60)
     
     for x_bench, v_bench in ace_v[:15]:  # First 15 points for readability
-        v_foam = interpolate_linear(foam_y_sorted, foam_v_sorted, x_bench)
+        v_foam = interpolate_linear(foam_x_horiz_sorted, foam_v_horiz_sorted, x_bench)
         if v_foam is not None:
             error = abs(v_foam - v_bench)
             pct_error = (error / (abs(v_bench) + 1e-10)) * 100
@@ -144,31 +147,32 @@ def validate_results(validation_dir):
         rms_v = math.sqrt(sum(e**2 for e in v_errors) / len(v_errors))
         print(f"\n🎯 Vertical RMS Error: {rms_v:.8f}")
     
-    # ========== HORIZONTAL CENTERLINE VALIDATION ==========
+    # ========== HORIZONTAL CENTERLINE VALIDATION (ALREADY CORRECTED) ==========
     print("\n📈 HORIZONTAL CENTERLINE VALIDATION (u-velocity along x=0.5)")
-    print("-" * 50)
+    print("Comparing ACE u-velocity at different y-positions along x=0.5 with OpenFOAM vertical centerline")
+    print("-" * 80)
     
-    # Extract OpenFOAM horizontal data
-    foam_x = []
-    foam_u = []
-    for row in horizontal_data:
-        x = float(row['Points:0'])  # x-coordinate  
+    # Extract OpenFOAM vertical centerline data (y-positions with u-velocity)
+    foam_y_vert = []
+    foam_u_vert = []
+    for row in vertical_data:
+        y = float(row['Points:1'])  # y-coordinate
         u = float(row['U:0'])       # u-velocity
-        foam_x.append(x)
-        foam_u.append(u)
+        foam_y_vert.append(y)
+        foam_u_vert.append(u)
     
-    # Sort by x-coordinate
-    sorted_indices = sorted(range(len(foam_x)), key=lambda k: foam_x[k])
-    foam_x_sorted = [foam_x[i] for i in sorted_indices]
-    foam_u_sorted = [foam_u[i] for i in sorted_indices]
+    # Sort by y-coordinate
+    sorted_indices_v = sorted(range(len(foam_y_vert)), key=lambda k: foam_y_vert[k])
+    foam_y_vert_sorted = [foam_y_vert[i] for i in sorted_indices_v]
+    foam_u_vert_sorted = [foam_u_vert[i] for i in sorted_indices_v]
     
-    # Compare with benchmark
+    # Compare with ACE horizontal benchmark
     u_errors = []
     print(f"{'y':<8} {'ACE u':<12} {'OpenFOAM u':<12} {'Error':<12} {'% Error'}")
-    print("-" * 50)
+    print("-" * 60)
     
     for y_bench, u_bench in ace_h[:15]:  # First 15 points
-        u_foam = interpolate_linear(foam_x_sorted, foam_u_sorted, y_bench)
+        u_foam = interpolate_linear(foam_y_vert_sorted, foam_u_vert_sorted, y_bench)
         if u_foam is not None:
             error = abs(u_foam - u_bench)
             pct_error = (error / (abs(u_bench) + 1e-10)) * 100
@@ -180,15 +184,15 @@ def validate_results(validation_dir):
         rms_u = math.sqrt(sum(e**2 for e in u_errors) / len(u_errors))
         print(f"\n🎯 Horizontal RMS Error: {rms_u:.8f}")
     
-    # ========== EXTREMA VALIDATION ==========
+    # ========== EXTREMA VALIDATION (CORRECTED) ==========
     print("\n📊 EXTREMA VALIDATION")
     print("-" * 30)
     
-    # Find extrema in OpenFOAM data
-    foam_u_min = min(foam_u_sorted)
-    foam_u_max = max(foam_u_sorted)
-    foam_v_min = min(foam_v_sorted)
-    foam_v_max = max(foam_v_sorted)
+    # Find extrema in CORRECT OpenFOAM data
+    foam_u_min = min(foam_u_vert_sorted)  # u_min from vertical centerline (x=0.5)
+    foam_u_max = max(foam_u_vert_sorted)  # u_max from vertical centerline
+    foam_v_min = min(foam_v_horiz_sorted) # v_min from horizontal centerline (y=0.5)  
+    foam_v_max = max(foam_v_horiz_sorted) # v_max from horizontal centerline
     
     print(f"Quantity          ACE Benchmark    OpenFOAM         Error")
     print("-" * 55)
