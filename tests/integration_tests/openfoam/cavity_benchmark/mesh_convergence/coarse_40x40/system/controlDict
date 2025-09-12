@@ -1,0 +1,39 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Solver application
+application     icoFoam;  // For laminar cavity flow benchmark
+
+// Time control
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         50;      // Standard benchmark time for cavity flow
+deltaT          0.005;    // Conservative timestep for stability
+
+// Output control for validation
+writeControl    timeStep;
+writeInterval   200;       
+purgeWrite      0;        // Keep all time directories for validation
+writeFormat     ascii;    // ASCII for easy post-processing
+writePrecision  8;        // High precision for benchmark comparison
+writeCompression off;     // No compression for validation clarity
+
+// Time formatting
+timeFormat      general;
+timePrecision   6;
+runTimeModifiable true;   // Allow runtime modifications
+
