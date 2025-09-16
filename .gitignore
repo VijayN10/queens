@@ -75,3 +75,27 @@ venv.bak/
 
 # best editor ever files
 *.swp
+
+# --- OpenFOAM and mesh convergence artifacts ---
+# Ignore heavy simulation outputs and validation data produced by OpenFOAM tests
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/0/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/constant/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/system/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/constant/polyMesh/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/processor*/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/postProcessing/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/plots/
+# tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/validation_data/*.csv
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/foam.foam
+
+# # Optionally ignore entire mesh case folders generated locally
+# tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/mesh_*/
+
+# Ignore all OpenFOAM numeric time-step directories (e.g., 1, 10, 0.001, 1e-03)
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/[0-9]*/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/[0-9]*.*/
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/*.[0-9]*/
+
+# Ignore heavy solver/job logs
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/pisoFoam.log
+tests/integration_tests/openfoam/cavity_benchmark/mesh_convergence/**/slurm-*.out
