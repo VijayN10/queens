@@ -311,12 +311,12 @@ def plot_mesh_convergence(all_mesh_data):
     ax1.loglog(mesh_sizes, rms_v_errors, 'ro-', linewidth=2, markersize=6, label='V-velocity RMS Error')
     ax1.loglog(mesh_sizes, rms_overall_errors, 'go-', linewidth=2, markersize=6, label='Overall RMS Error')
     
-    # Add theoretical convergence rates
-    if len(mesh_sizes) >= 2:
-        # Second-order convergence reference
-        h = [1/size for size in mesh_sizes]
-        second_order_ref = [rms_overall_errors[0] * (h[0]/hi)**2 for hi in h]
-        ax1.loglog(mesh_sizes, second_order_ref, 'k--', alpha=0.5, label='2nd Order Reference')
+    # # Add theoretical convergence rates
+    # if len(mesh_sizes) >= 2:
+    #     # Second-order convergence reference
+    #     h = [1/size for size in mesh_sizes]
+    #     second_order_ref = [rms_overall_errors[0] * (h[0]/hi)**2 for hi in h]
+    #     ax1.loglog(mesh_sizes, second_order_ref, 'k--', alpha=0.5, label='2nd Order Reference')
     
     ax1.set_xlabel('Mesh Size (NxN)')
     ax1.set_ylabel('RMS Error')
@@ -332,12 +332,12 @@ def plot_mesh_convergence(all_mesh_data):
         ax2.set_title('Grid Convergence Analysis', fontsize=14, fontweight='bold')
         ax2.grid(True, alpha=0.3)
         
-        # Add convergence rate annotation
-        if len(mesh_sizes) >= 2:
-            p = math.log(rms_overall_errors[-2]/rms_overall_errors[-1]) / math.log(mesh_sizes[-1]/mesh_sizes[-2])
-            ax2.text(0.05, 0.95, f'Apparent order of accuracy: {p:.2f}', 
-                    transform=ax2.transAxes, verticalalignment='top',
-                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+        # # Add convergence rate annotation
+        # if len(mesh_sizes) >= 2:
+        #     p = math.log(rms_overall_errors[-2]/rms_overall_errors[-1]) / math.log(mesh_sizes[-1]/mesh_sizes[-2])
+        #     ax2.text(0.05, 0.95, f'Apparent order of accuracy: {p:.2f}', 
+        #             transform=ax2.transAxes, verticalalignment='top',
+        #             bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
     else:
         ax2.text(0.5, 0.5, 'Need at least 3 mesh\nresolutions for\nconvergence analysis', 
                 ha='center', va='center', transform=ax2.transAxes)
@@ -439,12 +439,12 @@ def plot_validation_dashboard(all_mesh_data):
         ax4.grid(True, alpha=0.3)
         ax4.legend()
         
-        # Add convergence rate if possible
-        if len(mesh_sizes_conv) >= 2:
-            p = math.log(rms_overall_conv[-2]/rms_overall_conv[-1]) / math.log(mesh_sizes_conv[-1]/mesh_sizes_conv[-2])
-            ax4.text(0.05, 0.95, f'Apparent Order of Accuracy: {p:.2f}', 
-                    transform=ax4.transAxes, verticalalignment='top',
-                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+        # # Add convergence rate if possible
+        # if len(mesh_sizes_conv) >= 2:
+        #     p = math.log(rms_overall_conv[-2]/rms_overall_conv[-1]) / math.log(mesh_sizes_conv[-1]/mesh_sizes_conv[-2])
+        #     ax4.text(0.05, 0.95, f'Apparent Order of Accuracy: {p:.2f}', 
+        #             transform=ax4.transAxes, verticalalignment='top',
+        #             bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
     
     # Summary statistics table (bottom)
     ax5 = fig.add_subplot(gs[2, :])
