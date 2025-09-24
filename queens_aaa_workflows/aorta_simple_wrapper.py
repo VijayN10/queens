@@ -11,14 +11,32 @@ from pathlib import Path
 import numpy as np
 import json
 
-# Setup paths
-AORTA_PATH = Path('/home/a11evina/Aorta/ofCaseGen/Method_4').resolve()
-sys.path.insert(0, str(AORTA_PATH))
+# Setup paths for new integrated structure
+# Assuming we're running from queens/queens_aaa_workflows/
+current_dir = Path(__file__).parent
+repo_root = current_dir.parent  # Should be queens/ directory
+
+# AORTA path - now inside queens repo
+AORTA_PATH = repo_root / 'Aorta' / 'ofCaseGen' / 'Method_4'
+
+# Add paths to Python path
+sys.path.insert(0, str(repo_root / 'src'))  # For QUEENS
+sys.path.insert(0, str(AORTA_PATH))         # For AORTA
+
+print(f"🔧 AORTA path: {AORTA_PATH}")
+print(f"🔧 AORTA exists: {AORTA_PATH.exists()}")
 
 # AORTA imports
-from config import ConfigParams
-from main import generate_base_geometry_without_perturbation, apply_perturbation
-from src.vesselGen.save_stl_from_patches import save_stl_from_patches
+try:
+    from config import ConfigParams
+    from main import generate_base_geometry_without_perturbation, apply_perturbation
+    from src.vesselGen.save_stl_from_patches import save_stl_from_patches
+    print("✅ AORTA imports successful")
+except ImportError as e:
+    print(f"❌ AORTA import error: {e}")
+    print("Make sure AORTA is properly installed and paths are correct")
+    raise
+
 
 
 class AortaGeometryModel:
@@ -32,7 +50,11 @@ class AortaGeometryModel:
             output_dir: Directory to save generated geometries
             enable_perturbation: Whether to apply geometry perturbation
         """
-        self.output_dir = Path(output_dir)
+        # Save outputs under this script's directory by default
+        output_path = Path(output_dir)
+        if not output_path.is_absolute():
+            output_path = current_dir / output_path
+        self.output_dir = output_path
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.enable_perturbation = enable_perturbation
         self.geometry_registry = {}
@@ -112,6 +134,9 @@ class AortaGeometryModel:
             # Store original working directory
             original_cwd = os.getcwd()
             
+            # Ensure we are in the AORTA directory so relative data paths resolve
+            os.chdir(str(AORTA_PATH))
+            
             # Create AORTA config
             config = ConfigParams()
             
@@ -131,9 +156,6 @@ class AortaGeometryModel:
             print(f"   🔍 Anatomical points:")
             for point in config.anatomical_points:
                 print(f"      {point.name}: diameter={point.diameter:.1f}mm at ({point.x:.1f}, {point.y:.1f})")
-            
-            # Change to AORTA directory for geometry generation
-            os.chdir(str(AORTA_PATH))
             
             try:
                 # Generate base geometry
