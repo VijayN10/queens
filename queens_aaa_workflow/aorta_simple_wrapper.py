@@ -2,11 +2,13 @@
 """
 UPDATED: Simple AORTA wrapper for QUEENS integration with consolidated repo structure.
 This wrapper does NOT inherit from QUEENS Simulation class but is compatible with QUEENS workflows.
+Includes convex hull validation from Method 4.
 """
 
 import sys
 import numpy as np
 from pathlib import Path
+import json
 
 # NEW consolidated repo paths
 repo_root = Path(__file__).parent.parent  # Go up to queens/ root
@@ -25,6 +27,10 @@ from config import ConfigParams
 from main import generate_base_geometry_without_perturbation, apply_perturbation
 from src.vesselGen.save_stl_from_patches import save_stl_from_patches
 
+# Import convex hull validation from Method 4
+sys.path.insert(0, str(aorta_dir / 'data'))
+from data_bound_with_morphed_data import is_point_inside_hull
+
 # Change back to original directory
 os.chdir(original_dir)
 
@@ -37,7 +43,8 @@ class AortaGeometryModel:
     """
 
     def __init__(self, output_dir="queens_output", enable_morphing=False, random_seed=42,
-                 create_openfoam_cases=True):
+                 create_openfoam_cases=True, convex_hull_metadata_path=None,
+                 gender=None, age_group=None, outlier_method='manual'):
         """
         Initialize AORTA geometry model.
 
@@ -46,6 +53,10 @@ class AortaGeometryModel:
             enable_morphing: Whether to apply morphological perturbations
             random_seed: Seed for reproducible geometry generation
             create_openfoam_cases: Whether to create full OpenFOAM cases (not just geometries)
+            convex_hull_metadata_path: Path to convex hull metadata JSON from Method 4
+            gender: Gender for convex hull validation ('M', 'F', or 'All')
+            age_group: Age group for convex hull validation (e.g., '70-79')
+            outlier_method: Outlier detection method to use ('manual', 'zscore', etc.)
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
@@ -69,7 +80,18 @@ class AortaGeometryModel:
         self.aorta_dir = Path(__file__).parent.parent / 'Aorta' / 'ofCaseGen' / 'Method_4'
         self.original_dir = os.getcwd()
 
-        print(f"🎯 AortaGeometryModel initialized (UPDATED with OpenFOAM)")
+        # Convex hull validation parameters
+        self.convex_hull_metadata_path = convex_hull_metadata_path
+        self.gender = gender
+        self.age_group = age_group
+        self.outlier_method = outlier_method
+        self.convex_hull_data = None
+
+        # Load convex hull metadata if provided
+        if convex_hull_metadata_path and Path(convex_hull_metadata_path).exists():
+            self._load_convex_hull_metadata()
+
+        print(f"🎯 AortaGeometryModel initialized (UPDATED with OpenFOAM and Convex Hull)")
         print(f"   📁 Output directory: {self.output_dir.absolute()}")
         print(f"   📁 Geometry directory: {self.geometry_dir.absolute()}")
         if create_openfoam_cases:
@@ -77,10 +99,13 @@ class AortaGeometryModel:
         print(f"   🔄 Morphing enabled: {enable_morphing}")
         print(f"   🏗️  Create OpenFOAM cases: {create_openfoam_cases}")
         print(f"   🎲 Random seed: {random_seed}")
+        if self.convex_hull_data:
+            print(f"   ✅ Convex hull validation enabled:")
+            print(f"      Gender: {gender}, Age: {age_group}, Method: {outlier_method}")
 
     def evaluate(self, samples):
         """
-        Generate AORTA geometries for given parameter samples.
+        Generate AORTA geometries for given parameter samples with convex hull validation.
 
         Args:
             samples: numpy array of shape (n_samples, 4) containing:
@@ -96,20 +121,42 @@ class AortaGeometryModel:
 
         results = []
         self.geometry_metadata = []  # Store detailed metadata separately
+        validation_summary = {'valid': 0, 'invalid': 0, 'not_validated': 0}
 
         for i, sample in enumerate(samples):
             case_id = f"case_{i:03d}"
             print(f"\n📐 Generating geometry {i+1}/{len(samples)} - {case_id}")
 
+            # Validate parameters first if convex hull validation is enabled
+            validation_results = None
+            if self.convex_hull_data:
+                validation_results = self.validate_parameters(sample)
+                if validation_results['all_valid']:
+                    print(f"   ✅ Parameters are inside convex hull boundaries")
+                    validation_summary['valid'] += 1
+                else:
+                    print(f"   ⚠️  Parameters are OUTSIDE convex hull boundaries")
+                    validation_summary['invalid'] += 1
+                    for comparison, result in validation_results.items():
+                        if comparison != 'all_valid' and isinstance(result, dict) and not result.get('valid'):
+                            print(f"      ❌ {comparison}: point {result['point']}")
+            else:
+                validation_summary['not_validated'] += 1
+
             try:
-                # Create geometry
+                # Create geometry regardless of validation (for analysis purposes)
                 geometry_file = self._generate_single_geometry(sample, case_id)
+
+                # Save validation results if available
+                if validation_results:
+                    self.save_validation_results(case_id, sample, validation_results)
 
                 # Store successful result
                 self.geometry_metadata.append({
                     'case_id': case_id,
                     'geometry_file': str(geometry_file),
                     'parameters': sample.tolist(),
+                    'validation': validation_results,
                     'success': True
                 })
                 results.append(1.0)  # Success indicator
@@ -122,6 +169,7 @@ class AortaGeometryModel:
                     'case_id': case_id,
                     'geometry_file': None,
                     'parameters': sample.tolist(),
+                    'validation': validation_results,
                     'success': False,
                     'error': str(e)
                 })
@@ -132,8 +180,38 @@ class AortaGeometryModel:
         print(f"\n✅ Geometry generation complete!")
         print(f"   📊 Success rate: {successful}/{len(results)}")
 
+        if self.convex_hull_data:
+            print(f"   🔍 Validation summary:")
+            print(f"      ✅ Valid (inside hull): {validation_summary['valid']}")
+            print(f"      ⚠️  Invalid (outside hull): {validation_summary['invalid']}")
+            print(f"      - Not validated: {validation_summary['not_validated']}")
+
+        # Save overall summary
+        self._save_overall_summary(validation_summary)
+
         # Return in QUEENS-compatible format
         return {"result": np.array(results).reshape(-1, 1)}
+
+    def _save_overall_summary(self, validation_summary):
+        """Save overall validation summary to file."""
+        summary_file = self.geometry_dir / 'validation_summary.json'
+
+        summary_data = {
+            'total_cases': len(self.geometry_metadata),
+            'validation_summary': validation_summary,
+            'convex_hull_config': {
+                'enabled': self.convex_hull_data is not None,
+                'gender': self.gender,
+                'age_group': self.age_group,
+                'outlier_method': self.outlier_method
+            },
+            'cases': self.geometry_metadata
+        }
+
+        with open(summary_file, 'w') as f:
+            json.dump(summary_data, f, indent=2)
+
+        print(f"   📄 Validation summary saved to: {summary_file}")
     
     def _generate_single_geometry(self, parameters, case_id):
         """
@@ -325,23 +403,125 @@ class AortaGeometryModel:
             # Always return to original directory
             os.chdir(self.original_dir)
     
+    def _load_convex_hull_metadata(self):
+        """Load convex hull metadata from Method 4."""
+        try:
+            with open(self.convex_hull_metadata_path, 'r') as f:
+                all_hull_data = json.load(f)
+
+            # Filter for the specific gender, age group, and outlier method
+            self.convex_hull_data = {}
+
+            # Parameter pairs we need to validate
+            param_pairs = [
+                ('Neck Diameter 1', 'Neck Diameter 2'),
+                ('Neck Diameter 2', 'Maximum Aneurysm Diameter'),
+                ('Maximum Aneurysm Diameter', 'Distal Diameter')
+            ]
+
+            for hull_entry in all_hull_data:
+                if (hull_entry['gender'] == self.gender and
+                    hull_entry['age_group'] == self.age_group and
+                    hull_entry['outlier_method'] == self.outlier_method):
+
+                    comparison = hull_entry['parameter_comparison']
+                    self.convex_hull_data[comparison] = {
+                        'hull_points': np.array(hull_entry['convex_hull_points']),
+                        'group_size': hull_entry['group_size']
+                    }
+
+            print(f"   📊 Loaded {len(self.convex_hull_data)} convex hull boundaries")
+
+        except Exception as e:
+            print(f"   ⚠️  Failed to load convex hull metadata: {e}")
+            self.convex_hull_data = None
+
+    def validate_parameters(self, parameters):
+        """
+        Validate parameters against convex hull boundaries.
+
+        Args:
+            parameters: Array of [neck_d1, neck_d2, max_d, distal_d] in mm
+
+        Returns:
+            dict: Validation results for each parameter pair
+        """
+        if not self.convex_hull_data:
+            return {'valid': True, 'message': 'No convex hull validation configured'}
+
+        # Extract parameter values
+        neck_d1, neck_d2, max_d, distal_d = parameters
+
+        # Check each parameter pair
+        validations = {}
+        param_checks = [
+            ('Neck Diameter 1 vs Neck Diameter 2', (neck_d1, neck_d2)),
+            ('Neck Diameter 2 vs Maximum Aneurysm Diameter', (neck_d2, max_d)),
+            ('Maximum Aneurysm Diameter vs Distal Diameter', (max_d, distal_d))
+        ]
+
+        all_valid = True
+        for comparison, (param1, param2) in param_checks:
+            if comparison in self.convex_hull_data:
+                hull_points = self.convex_hull_data[comparison]['hull_points']
+                # Close the hull polygon
+                hull_closed = np.vstack((hull_points, hull_points[0]))
+
+                point = np.array([param1, param2])
+                is_valid = is_point_inside_hull(point, hull_closed)
+
+                validations[comparison] = {
+                    'valid': is_valid,
+                    'point': point.tolist()
+                }
+
+                if not is_valid:
+                    all_valid = False
+            else:
+                validations[comparison] = {
+                    'valid': None,
+                    'message': 'No hull data for this comparison'
+                }
+
+        validations['all_valid'] = all_valid
+        return validations
+
+    def save_validation_results(self, case_id, parameters, validation_results):
+        """Save validation results to JSON file."""
+        case_dir = self.geometry_dir / case_id
+        validation_file = case_dir / 'validation_results.json'
+
+        validation_data = {
+            'case_id': case_id,
+            'parameters': {
+                'neck_diameter_1': float(parameters[0]),
+                'neck_diameter_2': float(parameters[1]),
+                'max_diameter': float(parameters[2]),
+                'distal_diameter': float(parameters[3])
+            },
+            'validation': validation_results,
+            'gender': self.gender,
+            'age_group': self.age_group,
+            'outlier_method': self.outlier_method
+        }
+
+        with open(validation_file, 'w') as f:
+            json.dump(validation_data, f, indent=2)
+
     def validate_geometry(self, geometry_file, case_id):
         """
         Validate geometry using AORTA's convex hull methodology.
-        
+
         Args:
             geometry_file: Path to STL geometry file
             case_id: Case identifier
-            
+
         Returns:
             bool: True if geometry is valid (interior to convex hull)
         """
-        # TODO: Implement convex hull validation
-        # This will use your existing AORTA validation framework
-        
-        print(f"   🔍 Validating {case_id}... (validation TODO)")
-        
-        # Placeholder - always return True for now
+        # This is a placeholder - in practice, validation is done on parameters
+        # before geometry generation
+        print(f"   🔍 Validating {case_id}...")
         return True
 
 # Test function

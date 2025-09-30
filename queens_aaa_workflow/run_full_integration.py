@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """
-Fixed QUEENS-AORTA Integration Test Script
+Fixed QUEENS-AORTA Integration Test Script with Convex Hull Validation
 
 This script demonstrates the complete integration between QUEENS and AORTA frameworks
 for uncertainty quantification of abdominal aortic aneurysm (AAA) geometries.
+Now includes convex hull validation from Method 4.
 """
 
 import sys
 import os
 import numpy as np
 from pathlib import Path
+
+# Get repo root
+repo_root = Path(__file__).parent.parent
 
 # Ensure we can import QUEENS
 sys.path.insert(0, '/home/a11evina/queens/src')
@@ -69,14 +73,22 @@ def main():
             print(parameters)
             print()
             
-            # 3. Create the AORTA geometry model with OpenFOAM case generation
+            # 3. Create the AORTA geometry model with OpenFOAM case generation and convex hull validation
+            # Define convex hull metadata path (from Method 4)
+            convex_hull_path = repo_root / 'Aorta' / 'ofCaseGen' / 'Method_4' / 'data' / 'processed' / 'convex_hull_metadata.json'
+
             model = AortaGeometryModel(
                 output_dir='./geometries',
                 create_openfoam_cases=True,  # Enable full OpenFOAM case generation
                 enable_morphing=False,
-                random_seed=42
+                random_seed=42,
+                # Enable convex hull validation
+                convex_hull_metadata_path=str(convex_hull_path) if convex_hull_path.exists() else None,
+                gender='M',  # Example: Female
+                age_group='70-79',  # Example: 70-79 age group
+                outlier_method='manual'  # Use manual outlier detection
             )
-            print("✅ AORTA model initialized with OpenFOAM case generation")
+            print("✅ AORTA model initialized with OpenFOAM case generation and convex hull validation")
             
             # 4. Create Latin Hypercube Sampler with model and global_settings
             iterator = LatinHypercubeSampling(
@@ -157,7 +169,39 @@ def main():
             if output_path.exists():
                 output_files = list(output_path.iterdir())
                 print(f"  - {len(output_files)} QUEENS output files")
-            
+
+            # Display validation summary if available
+            validation_summary_file = Path('./geometries/validation_summary.json')
+            if validation_summary_file.exists():
+                import json
+                with open(validation_summary_file, 'r') as f:
+                    validation_data = json.load(f)
+
+                print("\n🔍 Convex Hull Validation Results:")
+                print(f"  Total cases: {validation_data['total_cases']}")
+                val_summary = validation_data['validation_summary']
+                print(f"  ✅ Valid (inside hull): {val_summary['valid']}")
+                print(f"  ⚠️  Invalid (outside hull): {val_summary['invalid']}")
+
+                config = validation_data['convex_hull_config']
+                if config['enabled']:
+                    print(f"\n  Configuration:")
+                    print(f"    Gender: {config['gender']}")
+                    print(f"    Age group: {config['age_group']}")
+                    print(f"    Outlier method: {config['outlier_method']}")
+
+                # List valid cases
+                valid_cases = [c for c in validation_data['cases']
+                             if c['success'] and c.get('validation', {}).get('all_valid')]
+                if valid_cases:
+                    print(f"\n  Valid cases ({len(valid_cases)}):")
+                    for case in valid_cases[:5]:  # Show first 5
+                        params = case['parameters']
+                        print(f"    - {case['case_id']}: neck1={params[0]:.1f}, "
+                              f"neck2={params[1]:.1f}, max={params[2]:.1f}, distal={params[3]:.1f}")
+                    if len(valid_cases) > 5:
+                        print(f"    ... and {len(valid_cases)-5} more")
+
             print("\n🎉 Integration test completed successfully!")
             return True
             

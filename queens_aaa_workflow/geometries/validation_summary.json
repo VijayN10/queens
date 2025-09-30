@@ -1,0 +1,191 @@
+{
+  "total_cases": 5,
+  "validation_summary": {
+    "valid": 3,
+    "invalid": 2,
+    "not_validated": 0
+  },
+  "convex_hull_config": {
+    "enabled": true,
+    "gender": "M",
+    "age_group": "70-79",
+    "outlier_method": "manual"
+  },
+  "cases": [
+    {
+      "case_id": "case_000",
+      "geometry_file": "geometries/case_000",
+      "parameters": [
+        22.119636941505668,
+        26.245260074320107,
+        49.73997849917881,
+        21.35340635005271
+      ],
+      "validation": {
+        "Neck Diameter 1 vs Neck Diameter 2": {
+          "valid": false,
+          "point": [
+            22.119636941505668,
+            26.245260074320107
+          ]
+        },
+        "Neck Diameter 2 vs Maximum Aneurysm Diameter": {
+          "valid": true,
+          "point": [
+            26.245260074320107,
+            49.73997849917881
+          ]
+        },
+        "Maximum Aneurysm Diameter vs Distal Diameter": {
+          "valid": true,
+          "point": [
+            49.73997849917881,
+            21.35340635005271
+          ]
+        },
+        "all_valid": false
+      },
+      "success": true
+    },
+    {
+      "case_id": "case_001",
+      "geometry_file": "geometries/case_001",
+      "parameters": [
+        26.45466287666092,
+        26.53019149434434,
+        50.99587915375907,
+        22.699201904843683
+      ],
+      "validation": {
+        "Neck Diameter 1 vs Neck Diameter 2": {
+          "valid": true,
+          "point": [
+            26.45466287666092,
+            26.53019149434434
+          ]
+        },
+        "Neck Diameter 2 vs Maximum Aneurysm Diameter": {
+          "valid": true,
+          "point": [
+            26.53019149434434,
+            50.99587915375907
+          ]
+        },
+        "Maximum Aneurysm Diameter vs Distal Diameter": {
+          "valid": true,
+          "point": [
+            50.99587915375907,
+            22.699201904843683
+          ]
+        },
+        "all_valid": true
+      },
+      "success": true
+    },
+    {
+      "case_id": "case_002",
+      "geometry_file": "geometries/case_002",
+      "parameters": [
+        23.53022317574844,
+        28.209004031048586,
+        61.03772933041488,
+        24.144942841103823
+      ],
+      "validation": {
+        "Neck Diameter 1 vs Neck Diameter 2": {
+          "valid": false,
+          "point": [
+            23.53022317574844,
+            28.209004031048586
+          ]
+        },
+        "Neck Diameter 2 vs Maximum Aneurysm Diameter": {
+          "valid": true,
+          "point": [
+            28.209004031048586,
+            61.03772933041488
+          ]
+        },
+        "Maximum Aneurysm Diameter vs Distal Diameter": {
+          "valid": true,
+          "point": [
+            61.03772933041488,
+            24.144942841103823
+          ]
+        },
+        "all_valid": false
+      },
+      "success": true
+    },
+    {
+      "case_id": "case_003",
+      "geometry_file": "geometries/case_003",
+      "parameters": [
+        27.16827831719365,
+        30.620581902954594,
+        56.7437965525179,
+        22.475600411360915
+      ],
+      "validation": {
+        "Neck Diameter 1 vs Neck Diameter 2": {
+          "valid": true,
+          "point": [
+            27.16827831719365,
+            30.620581902954594
+          ]
+        },
+        "Neck Diameter 2 vs Maximum Aneurysm Diameter": {
+          "valid": true,
+          "point": [
+            30.620581902954594,
+            56.7437965525179
+          ]
+        },
+        "Maximum Aneurysm Diameter vs Distal Diameter": {
+          "valid": true,
+          "point": [
+            56.7437965525179,
+            22.475600411360915
+          ]
+        },
+        "all_valid": true
+      },
+      "success": true
+    },
+    {
+      "case_id": "case_004",
+      "geometry_file": "geometries/case_004",
+      "parameters": [
+        25.101426557626446,
+        28.73012606332994,
+        53.78647412165763,
+        19.647341810492165
+      ],
+      "validation": {
+        "Neck Diameter 1 vs Neck Diameter 2": {
+          "valid": true,
+          "point": [
+            25.101426557626446,
+            28.73012606332994
+          ]
+        },
+        "Neck Diameter 2 vs Maximum Aneurysm Diameter": {
+          "valid": true,
+          "point": [
+            28.73012606332994,
+            53.78647412165763
+          ]
+        },
+        "Maximum Aneurysm Diameter vs Distal Diameter": {
+          "valid": true,
+          "point": [
+            53.78647412165763,
+            19.647341810492165
+          ]
+        },
+        "all_valid": true
+      },
+      "success": true
+    }
+  ]
+}
