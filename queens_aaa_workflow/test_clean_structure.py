@@ -49,11 +49,11 @@ def test_import_paths():
     # Test 3: Local config imports
     try:
         tests_total += 1
-        from queens_aaa_config import create_fixed_aaa_parameters
-        
+        from queens_aaa_config import create_aaa_parameters
+
         print("   ✅ Local config imports successful")
         tests_passed += 1
-        
+
     except ImportError as e:
         print(f"   ❌ Local config import failed: {e}")
         
@@ -119,15 +119,15 @@ def test_parameters_creation():
     print("\n🧪 Testing Parameter Creation...")
     
     try:
-        from queens_aaa_config import create_fixed_aaa_parameters
+        from queens_aaa_config import create_aaa_parameters
         from queens.global_settings import GlobalSettings
-        
+
         # Test parameter creation
         with GlobalSettings(
             experiment_name="test_parameters",
             output_dir="test_output"
         ) as gs:
-            parameters = create_fixed_aaa_parameters()
+            parameters = create_aaa_parameters()
             print("   ✅ Fixed parameters created successfully")
             
             # Simple test - just verify parameters were created

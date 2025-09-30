@@ -8,15 +8,25 @@ import sys
 import numpy as np
 from pathlib import Path
 
-# NEW consolidated repo paths  
+# NEW consolidated repo paths
 repo_root = Path(__file__).parent.parent  # Go up to queens/ root
+aorta_dir = repo_root / 'Aorta' / 'ofCaseGen' / 'Method_4'
+
+# Change to AORTA directory before imports (needed for relative paths in AORTA code)
+import os
+original_dir = os.getcwd()
+os.chdir(str(aorta_dir))
+
 sys.path.insert(0, str(repo_root / 'src'))
-sys.path.insert(0, str(repo_root / 'Aorta' / 'ofCaseGen' / 'Method_4'))
+sys.path.insert(0, str(aorta_dir))
 
 # AORTA imports (updated paths)
 from config import ConfigParams
 from main import generate_base_geometry_without_perturbation, apply_perturbation
 from src.vesselGen.save_stl_from_patches import save_stl_from_patches
+
+# Change back to original directory
+os.chdir(original_dir)
 
 class AortaGeometryModel:
     """
@@ -29,7 +39,7 @@ class AortaGeometryModel:
     def __init__(self, output_dir="queens_output", enable_morphing=False, random_seed=42):
         """
         Initialize AORTA geometry model.
-        
+
         Args:
             output_dir: Directory for QUEENS output files
             enable_morphing: Whether to apply morphological perturbations
@@ -37,15 +47,20 @@ class AortaGeometryModel:
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-        
+
         # Create geometry output directory
-        self.geometry_dir = Path("geometries") 
+        self.geometry_dir = Path("geometries")
         self.geometry_dir.mkdir(exist_ok=True)
-        
+
         self.enable_morphing = enable_morphing
         self.random_seed = random_seed
         self.case_counter = 0
-        
+
+        # Store AORTA directory for changing context during geometry generation
+        import os
+        self.aorta_dir = Path(__file__).parent.parent / 'Aorta' / 'ofCaseGen' / 'Method_4'
+        self.original_dir = os.getcwd()
+
         print(f"🎯 AortaGeometryModel initialized (UPDATED)")
         print(f"   📁 Output directory: {self.output_dir.absolute()}")
         print(f"   📁 Geometry directory: {self.geometry_dir.absolute()}")
@@ -108,46 +123,69 @@ class AortaGeometryModel:
     def _generate_single_geometry(self, parameters, case_id):
         """
         Generate a single AORTA geometry from parameters.
-        
+
         Args:
-            parameters: Array of [neck_d1, neck_d2, max_d, distal_d] 
+            parameters: Array of [neck_d1, neck_d2, max_d, distal_d] in mm
             case_id: Unique identifier for this case
-            
+
         Returns:
-            Path to generated STL file
+            Path to case directory containing 3 STL files
         """
-        # Create config with parameters
-        config = ConfigParams()
-        
-        # Set demographic parameters (fixed for Phase 1)
-        config.gender = 'F'  # Female
-        config.age_group = '70-79'
-        config.random_seed = self.random_seed
-        
-        # Update geometric parameters from QUEENS
-        config.neck_diameter_1 = float(parameters[0])
-        config.neck_diameter_2 = float(parameters[1])
-        config.max_diameter = float(parameters[2])
-        config.distal_diameter = float(parameters[3])
-        
-        print(f"   Parameters: neck_d1={parameters[0]:.3f}, neck_d2={parameters[1]:.3f}, "
-              f"max_d={parameters[2]:.3f}, distal_d={parameters[3]:.3f}")
-        
-        # Generate base geometry
-        patches = generate_base_geometry_without_perturbation(config)
-        print(f"   ✅ Base geometry: {len(patches)} patches")
-        
-        # Apply morphing if enabled 
-        if self.enable_morphing:
-            patches = apply_perturbation(patches, config)
-            print(f"   🔄 Morphing applied")
-        
-        # Save as STL
-        stl_file = self.geometry_dir / f"{case_id}.stl"
-        save_stl_from_patches(patches, str(stl_file))
-        print(f"   💾 STL saved: {stl_file.name}")
-        
-        return stl_file
+        import os
+        from src.vesselStats.parameter_sampler import AAAGeometryParams
+
+        # Change to AORTA directory (needed for relative paths in ConfigParams)
+        os.chdir(str(self.aorta_dir))
+
+        try:
+            # Create config (this loads distributions and generates default params)
+            config = ConfigParams()
+
+            # Override with QUEENS-provided parameters (in mm)
+            config.geometry_params = AAAGeometryParams(
+                neck_diameter_1=float(parameters[0]),
+                neck_diameter_2=float(parameters[1]),
+                max_diameter=float(parameters[2]),
+                distal_diameter=float(parameters[3])
+            )
+
+            # Regenerate anatomical points with updated parameters
+            config.anatomical_points = config.anatomical_template.generate_points(config.geometry_params)
+
+            print(f"   Parameters (mm): neck_d1={parameters[0]:.1f}, neck_d2={parameters[1]:.1f}, "
+                  f"max_d={parameters[2]:.1f}, distal_d={parameters[3]:.1f}")
+
+            # Generate base geometry
+            geometry = generate_base_geometry_without_perturbation(config)
+            print(f"   ✅ Base geometry: {len(geometry['faces'])} faces, 3 patches")
+
+            # Apply morphing if enabled
+            if self.enable_morphing:
+                geometry = apply_perturbation(geometry, config)
+                print(f"   🔄 Morphing applied")
+
+            # Change back to original directory before saving
+            os.chdir(self.original_dir)
+
+            # Save as 3 separate STL files (inlet, wall, outlet) like Method 4
+            case_dir = self.geometry_dir / case_id
+            case_dir.mkdir(exist_ok=True)
+
+            inlet_file = case_dir / "inlet.stl"
+            wall_file = case_dir / "wall.stl"
+            outlet_file = case_dir / "outlet.stl"
+
+            save_stl_from_patches(geometry['inlet_patch'], geometry['vertices'], str(inlet_file))
+            save_stl_from_patches(geometry['wall_patch'], geometry['vertices'], str(wall_file))
+            save_stl_from_patches(geometry['outlet_patch'], geometry['vertices'], str(outlet_file))
+
+            print(f"   💾 STL files saved: inlet.stl, wall.stl, outlet.stl")
+
+            return case_dir
+
+        finally:
+            # Ensure we always return to original directory
+            os.chdir(self.original_dir)
     
     def validate_geometry(self, geometry_file, case_id):
         """
@@ -182,8 +220,8 @@ def test_simple_wrapper():
     
     # Test with sample parameters
     test_samples = np.array([
-        [2.5, 2.8, 5.5, 2.2],  # Test case 1
-        [2.3, 2.6, 5.1, 2.0],  # Test case 2
+        [25.0, 28.0, 50.0, 22.0],  # Test case 1: moderate AAA
+        [23.0, 26.0, 60.0, 20.0],  # Test case 2: larger 
     ])
     
     # Generate geometries

@@ -101,7 +101,7 @@ def create_combined_openfoam_paraview_workflow():
             model=model,
             parameters=parameters,
             global_settings=global_settings,
-            num_samples=40,
+            num_samples=5,
             seed=42,
             result_description={"write_results": True, "plot_results": False},
         )
