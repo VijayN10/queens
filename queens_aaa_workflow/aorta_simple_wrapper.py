@@ -31,12 +31,13 @@ os.chdir(original_dir)
 class AortaGeometryModel:
     """
     UPDATED: Simple AORTA geometry model wrapper with consolidated repo structure.
-    
+
     This class provides a clean interface to AORTA's geometry generation
-    functionality for use with QUEENS framework.
+    functionality for use with QUEENS framework. Now includes full OpenFOAM case generation.
     """
-    
-    def __init__(self, output_dir="queens_output", enable_morphing=False, random_seed=42):
+
+    def __init__(self, output_dir="queens_output", enable_morphing=False, random_seed=42,
+                 create_openfoam_cases=True):
         """
         Initialize AORTA geometry model.
 
@@ -44,6 +45,7 @@ class AortaGeometryModel:
             output_dir: Directory for QUEENS output files
             enable_morphing: Whether to apply morphological perturbations
             random_seed: Seed for reproducible geometry generation
+            create_openfoam_cases: Whether to create full OpenFOAM cases (not just geometries)
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
@@ -52,7 +54,13 @@ class AortaGeometryModel:
         self.geometry_dir = Path("geometries")
         self.geometry_dir.mkdir(exist_ok=True)
 
+        # Create OpenFOAM cases output directory
+        self.openfoam_cases_dir = Path("openfoam_cases")
+        if create_openfoam_cases:
+            self.openfoam_cases_dir.mkdir(exist_ok=True)
+
         self.enable_morphing = enable_morphing
+        self.create_openfoam_cases = create_openfoam_cases
         self.random_seed = random_seed
         self.case_counter = 0
 
@@ -61,10 +69,13 @@ class AortaGeometryModel:
         self.aorta_dir = Path(__file__).parent.parent / 'Aorta' / 'ofCaseGen' / 'Method_4'
         self.original_dir = os.getcwd()
 
-        print(f"🎯 AortaGeometryModel initialized (UPDATED)")
+        print(f"🎯 AortaGeometryModel initialized (UPDATED with OpenFOAM)")
         print(f"   📁 Output directory: {self.output_dir.absolute()}")
         print(f"   📁 Geometry directory: {self.geometry_dir.absolute()}")
+        if create_openfoam_cases:
+            print(f"   📁 OpenFOAM cases directory: {self.openfoam_cases_dir.absolute()}")
         print(f"   🔄 Morphing enabled: {enable_morphing}")
+        print(f"   🏗️  Create OpenFOAM cases: {create_openfoam_cases}")
         print(f"   🎲 Random seed: {random_seed}")
 
     def evaluate(self, samples):
@@ -126,14 +137,14 @@ class AortaGeometryModel:
     
     def _generate_single_geometry(self, parameters, case_id):
         """
-        Generate a single AORTA geometry from parameters.
+        Generate a single AORTA geometry from parameters and optionally create OpenFOAM case.
 
         Args:
             parameters: Array of [neck_d1, neck_d2, max_d, distal_d] in mm
             case_id: Unique identifier for this case
 
         Returns:
-            Path to case directory containing 3 STL files
+            Path to case directory containing 3 STL files (and OpenFOAM case if enabled)
         """
         import os
         from src.vesselStats.parameter_sampler import AAAGeometryParams
@@ -185,10 +196,133 @@ class AortaGeometryModel:
 
             print(f"   💾 STL files saved: inlet.stl, wall.stl, outlet.stl")
 
+            # Create OpenFOAM case if enabled
+            if self.create_openfoam_cases:
+                of_case_dir = self._create_openfoam_case(geometry, case_id, config)
+                print(f"   🏗️  OpenFOAM case created: {of_case_dir.name}")
+
             return case_dir
 
         finally:
             # Ensure we always return to original directory
+            os.chdir(self.original_dir)
+
+    def _create_openfoam_case(self, geometry, case_id, config):
+        """
+        Create a complete OpenFOAM case using Method 4 code.
+
+        Args:
+            geometry: Dictionary containing geometry data (vertices, faces, patches)
+            case_id: Unique identifier for this case
+            config: ConfigParams object from Method 4
+
+        Returns:
+            Path to created OpenFOAM case directory
+        """
+        import os
+        import shutil
+        from src.ofCaseGen.compute_normals import computeNormals
+        from src.ofCaseGen.find_point_inside_stl import findPointInsideSTL
+        from src.ofCaseGen.correct_normal import correctNormal
+        from src.ofCaseGen.clean_and_repeat_cardiac_cycle import cleanAndRepeatCardiacCycle
+        from src.ofCaseGen.convert_velocity_components import convertVelocityComponents
+        from src.ofCaseGen.generate_u_file import generateUFile
+        from src.ofCaseGen.create_snappy_hex_mesh_dict import createSnappyHexMeshDict
+        from src.ofCaseGen.create_block_mesh_dict import createBlockMeshDict
+
+        print(f"   🏗️  Setting up OpenFOAM case for {case_id}...")
+
+        # Setup paths - use absolute paths
+        geometry_case_dir = (Path(self.original_dir) / self.geometry_dir / case_id).resolve()
+        of_case_dir = (Path(self.original_dir) / self.openfoam_cases_dir / case_id).resolve()
+
+        # Change to AORTA directory (needed for relative paths)
+        os.chdir(str(self.aorta_dir))
+
+        try:
+            # Step 1: Copy base case
+            print(f"   📦 Copying base case...")
+            base_case = self.aorta_dir / 'data' / 'input' / 'of_base_case'
+            of_case_dir.mkdir(parents=True, exist_ok=True)
+
+            # Copy base case structure
+            for item in base_case.iterdir():
+                if item.is_dir():
+                    shutil.copytree(item, of_case_dir / item.name, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(item, of_case_dir / item.name)
+
+            # Step 2: Copy geometry files to constant/triSurface
+            print(f"   📐 Copying geometry files...")
+            tri_surface_dir = of_case_dir / 'constant' / 'triSurface'
+            tri_surface_dir.mkdir(parents=True, exist_ok=True)
+
+            # Copy geometry files using absolute paths
+            shutil.copy2(geometry_case_dir / 'inlet.stl', tri_surface_dir / 'inlet.stl')
+            shutil.copy2(geometry_case_dir / 'wall.stl', tri_surface_dir / 'wall.stl')
+            shutil.copy2(geometry_case_dir / 'outlet.stl', tri_surface_dir / 'outlet.stl')
+
+            # Step 3: Compute normals and find interior point
+            print(f"   🧭 Computing normals and interior point...")
+            normals, avgNormal, referencePoint = computeNormals(str(tri_surface_dir / 'inlet.stl'))
+            insidePoint = findPointInsideSTL(str(tri_surface_dir / 'wall.stl'))
+            correctedNormal = correctNormal(avgNormal, referencePoint, insidePoint)
+
+            # Step 4: Process velocity data
+            print(f"   🌊 Processing velocity data...")
+            velocity_file = self.aorta_dir / 'data' / 'input' / 'U' / 'velocity_time.csv'
+
+            if not velocity_file.exists():
+                print(f"   ⚠️  Warning: velocity file not found at {velocity_file}")
+                print(f"   ⚠️  Skipping velocity processing...")
+            else:
+                cleanedData = cleanAndRepeatCardiacCycle(str(velocity_file), config.vessel_settings.num_cycles)
+
+                # Create temporary output directory for files
+                temp_files_dir = Path('data/output/files')
+                temp_files_dir.mkdir(parents=True, exist_ok=True)
+
+                outputCSV = temp_files_dir / 'corrected_velocity_time.csv'
+                convertVelocityComponents(cleanedData, str(outputCSV), correctedNormal)
+                generateUFile(str(outputCSV))
+
+                # Copy generated U file to case
+                u_file_src = temp_files_dir / 'U'
+                if u_file_src.exists():
+                    shutil.copy2(u_file_src, of_case_dir / '0' / 'U')
+
+            # Step 5: Create mesh dictionaries
+            print(f"   📝 Creating mesh dictionaries...")
+            temp_files_dir = Path('data/output/files')
+            temp_files_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create snappyHexMeshDict
+            shm_top = self.aorta_dir / 'data' / 'input' / 'shm' / 'shm_top.txt'
+            shm_bottom = self.aorta_dir / 'data' / 'input' / 'shm' / 'shm_bottom.txt'
+
+            if shm_top.exists() and shm_bottom.exists():
+                snappy_dict_path = temp_files_dir / 'snappyHexMeshDict'
+                createSnappyHexMeshDict(insidePoint, str(shm_top), str(shm_bottom), str(snappy_dict_path))
+
+                # Copy to case
+                shutil.copy2(snappy_dict_path, of_case_dir / 'system' / 'snappyHexMeshDict')
+            else:
+                print(f"   ⚠️  Warning: snappyHexMesh templates not found")
+
+            # Create blockMeshDict
+            wall_stl_for_blockmesh = tri_surface_dir / 'wall.stl'
+            block_dict_path = temp_files_dir / 'blockMeshDict'
+            createBlockMeshDict(str(wall_stl_for_blockmesh), str(block_dict_path))
+
+            # Copy to case
+            shutil.copy2(block_dict_path, of_case_dir / 'system' / 'blockMeshDict')
+
+            print(f"   ✅ OpenFOAM case complete at {of_case_dir.relative_to(Path(self.original_dir))}")
+
+            return of_case_dir
+
+        finally:
+            # Always return to original directory
             os.chdir(self.original_dir)
     
     def validate_geometry(self, geometry_file, case_id):

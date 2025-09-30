@@ -26,7 +26,7 @@ from queens_aaa_config import create_aaa_parameters, load_fitted_distributions
 
 def create_output_directories():
     """Create required output directories."""
-    directories = ['queens_output', 'geometries']
+    directories = ['queens_output', 'geometries', 'openfoam_cases']
     for dir_name in directories:
         os.makedirs(dir_name, exist_ok=True)
         print(f"✅ Created directory: {dir_name}")
@@ -69,11 +69,14 @@ def main():
             print(parameters)
             print()
             
-            # 3. Create the AORTA geometry model
+            # 3. Create the AORTA geometry model with OpenFOAM case generation
             model = AortaGeometryModel(
-                output_dir='./geometries'
+                output_dir='./geometries',
+                create_openfoam_cases=True,  # Enable full OpenFOAM case generation
+                enable_morphing=False,
+                random_seed=42
             )
-            print("✅ AORTA model initialized")
+            print("✅ AORTA model initialized with OpenFOAM case generation")
             
             # 4. Create Latin Hypercube Sampler with model and global_settings
             iterator = LatinHypercubeSampling(
@@ -110,8 +113,9 @@ def main():
             print("📊 RESULTS SUMMARY")
             print("=" * 50)
             
-            print(f"✅ Successfully generated {len(iterator.samples)} geometries")
+            print(f"✅ Successfully generated {len(iterator.samples)} complete cases")
             print(f"📁 Geometries saved to: ./geometries/")
+            print(f"🏗️  OpenFOAM cases saved to: ./openfoam_cases/")
             print(f"📊 QUEENS output saved to: {output_dir}/")
             
             # Display sample parameters
@@ -122,13 +126,33 @@ def main():
             
             # Check output files
             print("\n📁 Generated Files:")
+
+            # Geometry files
             geometry_dir = Path('./geometries')
             if geometry_dir.exists():
-                stl_files = list(geometry_dir.glob('*.stl'))
-                print(f"  - {len(stl_files)} STL geometry files")
-                for stl_file in stl_files:
-                    print(f"    • {stl_file.name}")
-            
+                case_dirs = [d for d in geometry_dir.iterdir() if d.is_dir()]
+                print(f"  - {len(case_dirs)} geometry case directories")
+                for case_dir in case_dirs:
+                    stl_files = list(case_dir.glob('*.stl'))
+                    print(f"    • {case_dir.name}: {len(stl_files)} STL files")
+
+            # OpenFOAM cases
+            openfoam_dir = Path('./openfoam_cases')
+            if openfoam_dir.exists():
+                of_case_dirs = [d for d in openfoam_dir.iterdir() if d.is_dir()]
+                print(f"  - {len(of_case_dirs)} OpenFOAM case directories")
+                for of_case_dir in of_case_dirs:
+                    print(f"    • {of_case_dir.name}: Ready for simulation")
+                    # Check for key OpenFOAM directories
+                    has_0 = (of_case_dir / '0').exists()
+                    has_system = (of_case_dir / 'system').exists()
+                    has_constant = (of_case_dir / 'constant').exists()
+                    has_tri = (of_case_dir / 'constant' / 'triSurface').exists()
+                    print(f"      ✓ Case structure: 0/={'✓' if has_0 else '✗'}, "
+                          f"system/={'✓' if has_system else '✗'}, "
+                          f"constant/={'✓' if has_constant else '✗'}, "
+                          f"triSurface/={'✓' if has_tri else '✗'}")
+
             output_path = Path(output_dir)
             if output_path.exists():
                 output_files = list(output_path.iterdir())
@@ -147,7 +171,13 @@ if __name__ == "__main__":
     success = main()
     if success:
         print("\n✅ QUEENS-AORTA integration is working!")
-        print("🚀 Ready for full uncertainty quantification workflow!")
+        print("🏗️  Full OpenFOAM cases created successfully!")
+        print("🚀 Ready for CFD simulations and uncertainty quantification!")
+        print("\n📋 Next steps:")
+        print("   1. Run blockMesh in each OpenFOAM case")
+        print("   2. Run snappyHexMesh to generate the mesh")
+        print("   3. Run your CFD solver (e.g., pimpleFoam)")
+        print("   4. Post-process results")
     else:
         print("\n❌ Integration test failed - check errors above")
         sys.exit(1)
