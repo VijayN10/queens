@@ -59,32 +59,32 @@ def create_aaa_parameters():
     # Neck diameter 1 (mm) - proximal neck diameter
     # Clinical range: 18-30mm, typical: 22-26mm
     neck_diameter_1 = Normal(
-        mean=2.5,  # 25mm in cm
-        covariance=0.04  # std ≈ 2mm in cm
+        mean=25.0,  # mm
+        covariance=4.0  # std ≈ 2mm
     )
-    
-    # Neck diameter 2 (mm) - distal neck diameter  
+
+    # Neck diameter 2 (mm) - distal neck diameter
     # Typically slightly larger than neck 1
     # Clinical range: 20-32mm, typical: 24-30mm
     neck_diameter_2 = Normal(
-        mean=2.8,  # 28mm in cm
-        covariance=0.04  # std ≈ 2mm in cm
+        mean=28.0,  # mm
+        covariance=4.0  # std ≈ 2mm
     )
-    
+
     # Maximum aneurysm diameter (mm) - key diagnostic parameter
-    # AAA definition: ≥30mm (3cm), typical range: 30-80mm
+    # AAA definition: ≥30mm, typical range: 30-80mm
     # Mean around 55mm for surgical candidates
     max_diameter = Normal(
-        mean=5.5,  # 55mm in cm
-        covariance=0.25  # std ≈ 5mm in cm
+        mean=55.0,  # mm
+        covariance=25.0  # std ≈ 5mm
     )
-    
+
     # Distal diameter (mm) - diameter at distal end
     # Typically smaller than max, larger than normal aorta
     # Clinical range: 15-25mm, typical: 18-24mm
     distal_diameter = Normal(
-        mean=2.2,  # 22mm in cm
-        covariance=0.04  # std ≈ 2mm in cm
+        mean=22.0,  # mm
+        covariance=4.0  # std ≈ 2mm
     )
     
     # Create QUEENS Parameters object
@@ -156,17 +156,17 @@ def print_parameter_summary(parameters):
     """Print a summary of the parameter distributions."""
     print("🔍 AAA Parameter Distributions Summary")
     print("=" * 50)
-    
+
     for name, distribution in parameters.dict.items():
-        mean_mm = (distribution.mean * 10).item()  # Convert cm to mm
-        std_mm = (np.sqrt(distribution.covariance) * 10).item()
+        mean_mm = distribution.mean.item()  # Already in mm
+        std_mm = np.sqrt(distribution.covariance).item()
         print(f"{name:15s}: {mean_mm:5.1f} ± {std_mm:4.1f} mm")
-    
+
     print("\n📊 Clinical Context:")
     print("   - Normal aorta diameter: ~20mm")
     print("   - AAA definition: ≥30mm max diameter")
     print("   - Surgical threshold: ~55mm max diameter")
-    print("   - Parameters in cm for AORTA compatibility")
+    print("   - All parameters in mm")
 
 
 # Test function

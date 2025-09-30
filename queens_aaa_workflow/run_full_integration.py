@@ -71,8 +71,7 @@ def main():
             
             # 3. Create the AORTA geometry model
             model = AortaGeometryModel(
-                output_dir='./geometries',
-                demographic=('F', '70-79')
+                output_dir='./geometries'
             )
             print("✅ AORTA model initialized")
             

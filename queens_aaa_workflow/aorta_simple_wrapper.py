@@ -70,55 +70,59 @@ class AortaGeometryModel:
     def evaluate(self, samples):
         """
         Generate AORTA geometries for given parameter samples.
-        
+
         Args:
             samples: numpy array of shape (n_samples, 4) containing:
                     [neck_diameter_1, neck_diameter_2, max_diameter, distal_diameter]
-        
+
         Returns:
-            numpy array of results containing geometry files and metadata
+            Dictionary with 'result' key containing success indicators (1.0 or 0.0)
         """
         print(f"\n🚀 Starting AORTA geometry generation for {len(samples)} samples...")
-        
+
         # Set random seed for reproducibility
         np.random.seed(self.random_seed)
-        
+
         results = []
-        
+        self.geometry_metadata = []  # Store detailed metadata separately
+
         for i, sample in enumerate(samples):
             case_id = f"case_{i:03d}"
             print(f"\n📐 Generating geometry {i+1}/{len(samples)} - {case_id}")
-            
+
             try:
                 # Create geometry
                 geometry_file = self._generate_single_geometry(sample, case_id)
-                
+
                 # Store successful result
-                results.append({
+                self.geometry_metadata.append({
                     'case_id': case_id,
                     'geometry_file': str(geometry_file),
                     'parameters': sample.tolist(),
                     'success': True
                 })
-                
+                results.append(1.0)  # Success indicator
+
                 print(f"   ✅ Success: {Path(geometry_file).name}")
-                
+
             except Exception as e:
                 print(f"   ❌ Error generating geometry: {str(e)}")
-                results.append({
-                    'case_id': case_id, 
+                self.geometry_metadata.append({
+                    'case_id': case_id,
                     'geometry_file': None,
                     'parameters': sample.tolist(),
                     'success': False,
                     'error': str(e)
                 })
-        
+                results.append(0.0)  # Failure indicator
+
         # Summary
-        successful = sum(1 for r in results if r['success'])
+        successful = sum(1 for r in self.geometry_metadata if r['success'])
         print(f"\n✅ Geometry generation complete!")
         print(f"   📊 Success rate: {successful}/{len(results)}")
-        
-        return np.array(results)
+
+        # Return in QUEENS-compatible format
+        return {"result": np.array(results).reshape(-1, 1)}
     
     def _generate_single_geometry(self, parameters, case_id):
         """
@@ -218,10 +222,10 @@ def test_simple_wrapper():
         random_seed=42
     )
     
-    # Test with sample parameters
+    # Test with sample parameters (all in mm)
     test_samples = np.array([
-        [25.0, 28.0, 50.0, 22.0],  # Test case 1: moderate AAA
-        [23.0, 26.0, 60.0, 20.0],  # Test case 2: larger 
+        [25.0, 28.0, 50.0, 22.0],  # Test case 1: moderate AAA (mm)
+        [23.0, 26.0, 60.0, 20.0],  # Test case 2: larger AAA (mm)
     ])
     
     # Generate geometries

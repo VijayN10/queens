@@ -1,0 +1,91 @@
+09-30 15:33 queens.utils.ascii_art INFO                                                                                       
+09-30 15:33 queens.utils.ascii_art INFO                                             *                                         
+09-30 15:33 queens.utils.ascii_art INFO                                           * | *                                       
+09-30 15:33 queens.utils.ascii_art INFO                                          * \|/ *                                      
+09-30 15:33 queens.utils.ascii_art INFO                                     * * * \|O|/ * * *                                 
+09-30 15:33 queens.utils.ascii_art INFO                                      \o\o\o|O|o/o/o/                                  
+09-30 15:33 queens.utils.ascii_art INFO                                      (<><><>O<><><>)                                  
+09-30 15:33 queens.utils.ascii_art INFO                                       '==========='                                   
+09-30 15:33 queens.utils.ascii_art INFO                                                                                       
+09-30 15:33 queens.utils.ascii_art INFO               :'#######::'##::::'##:'########:'########:'##::: ##::'######::         
+09-30 15:33 queens.utils.ascii_art INFO               '##.... ##: ##:::: ##: ##.....:: ##.....:: ###:: ##:'##... ##:         
+09-30 15:33 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ##::::::: ##::::::: ####: ##: ##:::..::         
+09-30 15:33 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ######::: ######::: ## ## ##:. ######::         
+09-30 15:33 queens.utils.ascii_art INFO                ##:'## ##: ##:::: ##: ##...:::: ##...:::: ##. ####::..... ##:         
+09-30 15:33 queens.utils.ascii_art INFO                ##:.. ##:: ##:::: ##: ##::::::: ##::::::: ##:. ###:'##::: ##:         
+09-30 15:33 queens.utils.ascii_art INFO               : ##### ##:. #######:: ########: ########: ##::. ##:. ######::         
+09-30 15:33 queens.utils.ascii_art INFO               :.....:..:::.......:::........::........::..::::..:::......:::         
+09-30 15:33 queens.utils.ascii_art INFO                                                                                      
+09-30 15:33 queens.utils.ascii_art INFO                                                                                      
+09-30 15:33 queens.utils.ascii_art INFO                A general purpose framework for Uncertainty Quantification,           
+09-30 15:33 queens.utils.ascii_art INFO                 Physics-Informed Machine Learning, Bayesian Optimization,            
+09-30 15:33 queens.utils.ascii_art INFO                         Inverse Problems and Simulation Analytics                    
+09-30 15:33 queens.utils.ascii_art INFO                                                                                      
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     |                                    Normal                                     |
+09-30 15:33 queens.distributions.normal INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-30 15:33 queens.distributions.normal INFO     | self       : <queens.distributions.normal.Normal object at 0x74cbcec24d90>    |
+09-30 15:33 queens.distributions.normal INFO     | mean       : 25.0                                                             |
+09-30 15:33 queens.distributions.normal INFO     | covariance : 4.0                                                              |
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     |                                    Normal                                     |
+09-30 15:33 queens.distributions.normal INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-30 15:33 queens.distributions.normal INFO     | self       : <queens.distributions.normal.Normal object at 0x74cbcea35850>    |
+09-30 15:33 queens.distributions.normal INFO     | mean       : 28.0                                                             |
+09-30 15:33 queens.distributions.normal INFO     | covariance : 4.0                                                              |
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     |                                    Normal                                     |
+09-30 15:33 queens.distributions.normal INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-30 15:33 queens.distributions.normal INFO     | self       : <queens.distributions.normal.Normal object at 0x74cbcea358d0>    |
+09-30 15:33 queens.distributions.normal INFO     | mean       : 55.0                                                             |
+09-30 15:33 queens.distributions.normal INFO     | covariance : 25.0                                                             |
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     |                                    Normal                                     |
+09-30 15:33 queens.distributions.normal INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-30 15:33 queens.distributions.normal INFO     | self       : <queens.distributions.normal.Normal object at 0x74cbcef4b190>    |
+09-30 15:33 queens.distributions.normal INFO     | mean       : 22.0                                                             |
+09-30 15:33 queens.distributions.normal INFO     | covariance : 4.0                                                              |
+09-30 15:33 queens.distributions.normal INFO     +-------------------------------------------------------------------------------+
+09-30 15:33 queens.distributions.normal INFO     
+09-30 15:33 queens.parameters.parameters INFO     
+09-30 15:33 queens.parameters.parameters INFO     +--------------------------------------------------------------------------------------+
+09-30 15:33 queens.parameters.parameters INFO     |                                      Parameters                                      |
+09-30 15:33 queens.parameters.parameters INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+09-30 15:33 queens.parameters.parameters INFO     | self            : <queens.parameters.parameters.Parameters object at 0x74cbcea357d0> |
+09-30 15:33 queens.parameters.parameters INFO     | neck_diameter_1 : <queens.distributions.normal.Normal object at 0x74cbcec24d90>      |
+09-30 15:33 queens.parameters.parameters INFO     | neck_diameter_2 : <queens.distributions.normal.Normal object at 0x74cbcea35850>      |
+09-30 15:33 queens.parameters.parameters INFO     | max_diameter    : <queens.distributions.normal.Normal object at 0x74cbcea358d0>      |
+09-30 15:33 queens.parameters.parameters INFO     | distal_diameter : <queens.distributions.normal.Normal object at 0x74cbcef4b190>      |
+09-30 15:33 queens.parameters.parameters INFO     +--------------------------------------------------------------------------------------+
+09-30 15:33 queens.parameters.parameters INFO     
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     +------------------------------------------------------------------------------------------------------------------+
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     |                                              LatinHypercubeSampling                                              |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | self               : <queens.iterators.latin_hypercube_sampling.LatinHypercubeSampling object at 0x74cbceeb6a10> |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | model              : <aorta_simple_wrapper.AortaGeometryModel object at 0x74cbcea35810>                          |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | parameters         : <queens.parameters.parameters.Parameters object at 0x74cbcea357d0>                          |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | global_settings    : <queens.global_settings.GlobalSettings object at 0x74cbe02a9f10>                            |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | seed               : 42                                                                                          |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | num_samples        : 5                                                                                           |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | result_description : None                                                                                        |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | num_iterations     : 10                                                                                          |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     | criterion          : 'maximin'                                                                                   |
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     +------------------------------------------------------------------------------------------------------------------+
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     Number of inputs: 4
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     Number of samples: 5
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     Criterion: maximin
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     Number of iterations: 10
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     Size of inputs (5, 4)
+09-30 15:33 queens.iterators.latin_hypercube_sampling INFO     Size of outputs (5, 1)
