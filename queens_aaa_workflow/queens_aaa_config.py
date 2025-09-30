@@ -101,54 +101,54 @@ def create_aaa_parameters():
 def get_parameter_bounds():
     """
     Get reasonable bounds for AAA parameters for validation.
-    
+
     Returns:
-        dict: Parameter bounds in cm
+        dict: Parameter bounds in mm
     """
     return {
-        'neck_diameter_1': (1.5, 3.5),    # 15-35mm
-        'neck_diameter_2': (1.8, 3.8),    # 18-38mm  
-        'max_diameter': (3.0, 8.0),       # 30-80mm
-        'distal_diameter': (1.2, 3.0),    # 12-30mm
+        'neck_diameter_1': (15, 35),    # mm
+        'neck_diameter_2': (18, 38),    # mm
+        'max_diameter': (30, 80),       # mm
+        'distal_diameter': (12, 30),    # mm
     }
 
 
 def validate_parameters(sample):
     """
     Validate that parameter sample is within reasonable clinical bounds.
-    
+
     Args:
-        sample: Array of [neck_diameter_1, neck_diameter_2, max_diameter, distal_diameter]
-        
+        sample: Array of [neck_diameter_1, neck_diameter_2, max_diameter, distal_diameter] in mm
+
     Returns:
         bool: True if parameters are valid
-        
+
     Raises:
         ValueError: If parameters are invalid with explanation
     """
     neck_d1, neck_d2, max_d, distal_d = sample
     bounds = get_parameter_bounds()
-    
+
     # Check individual parameter bounds
     if not (bounds['neck_diameter_1'][0] <= neck_d1 <= bounds['neck_diameter_1'][1]):
-        raise ValueError(f"neck_diameter_1 ({neck_d1:.2f}) outside bounds {bounds['neck_diameter_1']}")
-        
+        raise ValueError(f"neck_diameter_1 ({neck_d1:.2f} mm) outside bounds {bounds['neck_diameter_1']} mm")
+
     if not (bounds['neck_diameter_2'][0] <= neck_d2 <= bounds['neck_diameter_2'][1]):
-        raise ValueError(f"neck_diameter_2 ({neck_d2:.2f}) outside bounds {bounds['neck_diameter_2']}")
-        
+        raise ValueError(f"neck_diameter_2 ({neck_d2:.2f} mm) outside bounds {bounds['neck_diameter_2']} mm")
+
     if not (bounds['max_diameter'][0] <= max_d <= bounds['max_diameter'][1]):
-        raise ValueError(f"max_diameter ({max_d:.2f}) outside bounds {bounds['max_diameter']}")
-        
+        raise ValueError(f"max_diameter ({max_d:.2f} mm) outside bounds {bounds['max_diameter']} mm")
+
     if not (bounds['distal_diameter'][0] <= distal_d <= bounds['distal_diameter'][1]):
-        raise ValueError(f"distal_diameter ({distal_d:.2f}) outside bounds {bounds['distal_diameter']}")
-    
+        raise ValueError(f"distal_diameter ({distal_d:.2f} mm) outside bounds {bounds['distal_diameter']} mm")
+
     # Check logical constraints
     if max_d <= max(neck_d1, neck_d2):
-        raise ValueError(f"max_diameter ({max_d:.2f}) must be larger than neck diameters")
-        
-    if abs(neck_d2 - neck_d1) > 1.0:  # Necks shouldn't differ by more than 10mm
-        raise ValueError(f"Neck diameter difference too large: {abs(neck_d2 - neck_d1):.2f} cm")
-    
+        raise ValueError(f"max_diameter ({max_d:.2f} mm) must be larger than neck diameters")
+
+    if abs(neck_d2 - neck_d1) > 10.0:  # Necks shouldn't differ by more than 10mm
+        raise ValueError(f"Neck diameter difference too large: {abs(neck_d2 - neck_d1):.2f} mm")
+
     return True
 
 
@@ -158,8 +158,8 @@ def print_parameter_summary(parameters):
     print("=" * 50)
     
     for name, distribution in parameters.dict.items():
-        mean_mm = distribution.mean * 10  # Convert cm to mm
-        std_mm = np.sqrt(distribution.covariance) * 10
+        mean_mm = (distribution.mean * 10).item()  # Convert cm to mm
+        std_mm = (np.sqrt(distribution.covariance) * 10).item()
         print(f"{name:15s}: {mean_mm:5.1f} ± {std_mm:4.1f} mm")
     
     print("\n📊 Clinical Context:")
@@ -182,19 +182,19 @@ def test_parameter_creation():
     # Test parameter validation
     print("\n🔍 Testing Parameter Validation:")
     
-    # Valid sample
-    valid_sample = [2.5, 2.8, 5.5, 2.2]
+    # Valid sample (in mm)
+    valid_sample = [25, 28, 55, 22]
     try:
         validate_parameters(valid_sample)
-        print(f"✅ Valid sample: {valid_sample}")
+        print(f"✅ Valid sample: {valid_sample} mm")
     except ValueError as e:
         print(f"❌ Validation failed: {e}")
-    
+
     # Invalid sample (max < neck)
-    invalid_sample = [2.5, 2.8, 2.0, 2.2]  # max_diameter too small
+    invalid_sample = [25, 28, 20, 22]  # max_diameter too small
     try:
         validate_parameters(invalid_sample)
-        print(f"❌ Should have failed: {invalid_sample}")
+        print(f"❌ Should have failed: {invalid_sample} mm")
     except ValueError as e:
         print(f"✅ Correctly rejected invalid sample: {e}")
     
