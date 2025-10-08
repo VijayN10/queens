@@ -123,3 +123,9 @@ tests/integration_tests/openfoam/cavity_benchmark/benchmark_validation/**/[0-9]*
 tests/integration_tests/openfoam/cavity_benchmark/benchmark_validation/**/*.[0-9]*/
 tests/integration_tests/openfoam/cavity_benchmark/benchmark_validation/**/pisoFoam.log
 tests/integration_tests/openfoam/cavity_benchmark/benchmark_validation/**/slurm-*.out
+**/polyMesh/faces
+**/polyMesh/points
+**/polyMesh/neighbour
+**/polyMesh/owner
+# Or ignore entire polyMesh directories
+**/constant/polyMesh/
