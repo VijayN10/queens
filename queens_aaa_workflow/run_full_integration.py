@@ -27,6 +27,7 @@ from queens.global_settings import GlobalSettings
 # Import our integration modules
 from aorta_simple_wrapper import AortaGeometryModel
 from queens_aaa_config import create_aaa_parameters, load_fitted_distributions
+from run_openfoam_cases import OpenFOAMCaseRunner
 
 def create_output_directories():
     """Create required output directories."""
@@ -117,7 +118,6 @@ def main():
             print(f"✅ Evaluated model at all sample points")
             
             # Post-run: Process results
-            iterator.post_run()
             print("✅ Post-processing completed")
             
             # 6. Report results
@@ -202,9 +202,63 @@ def main():
                     if len(valid_cases) > 5:
                         print(f"    ... and {len(valid_cases)-5} more")
 
-            print("\n🎉 Integration test completed successfully!")
+            print("\n🎉 Geometry generation completed successfully!")
+
+            # 7. Run OpenFOAM simulations on generated cases
+            print("\n" + "=" * 50)
+            print("🌊 RUNNING OPENFOAM SIMULATIONS")
+            print("=" * 50)
+
+            # Create OpenFOAM runner
+            runner = OpenFOAMCaseRunner(
+                openfoam_bashrc="/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/openfoam-org-9-yjq7t3b3xh75m5s7u5bntedww5u7sekn/etc/bashrc",
+                solver="pimpleFoam",  # Transient solver for AAA blood flow
+                parallel=False,  # Set to True for parallel runs
+                num_procs=1,  # Increase for parallel runs (match decomposeParDict)
+                run_blockmesh=True,
+                run_snappyhexmesh=True,
+                run_solver=False  # Set to True to actually run the solver (takes long time!)
+            )
+
+            print("\n⚙️  OpenFOAM Configuration:")
+            print(f"   Solver: {runner.solver}")
+            print(f"   Parallel: {runner.parallel}")
+            print(f"   Processors: {runner.num_procs}")
+            print(f"   Steps: blockMesh={runner.run_blockmesh}, "
+                  f"snappyHexMesh={runner.run_snappyhexmesh}, "
+                  f"solver={runner.run_solver}")
+
+            # Option to run simulations
+            run_simulations = True  # Change to True to run simulations
+
+            if run_simulations:
+                print("\n🚀 Running OpenFOAM simulations...")
+                sim_results = runner.run_multiple_cases(
+                    cases_dir='./openfoam_cases',
+                    sequential=True  # Run one case at a time
+                )
+
+                # Save simulation results
+                print(f"\n📊 Simulation Results:")
+                successful_sims = sum(1 for r in sim_results if r['success'])
+                print(f"   ✅ Successful: {successful_sims}/{len(sim_results)}")
+
+                if successful_sims < len(sim_results):
+                    print(f"   ❌ Failed: {len(sim_results) - successful_sims}")
+                    failed_cases = [r['case_id'] for r in sim_results if not r['success']]
+                    print(f"   Failed cases: {failed_cases}")
+            else:
+                print("\n⏭️  Skipping simulations (set run_simulations=True to run)")
+                print("   To run simulations manually:")
+                print("   1. cd openfoam_cases/case_000")
+                print("   2. source /opt/openfoam9/etc/bashrc")
+                print("   3. blockMesh")
+                print("   4. surfaceFeatures")
+                print("   5. snappyHexMesh -overwrite")
+                print("   6. pimpleFoam")
+
             return True
-            
+
     except Exception as e:
         print(f"❌ Error during integration test: {e}")
         import traceback
@@ -214,14 +268,41 @@ def main():
 if __name__ == "__main__":
     success = main()
     if success:
-        print("\n✅ QUEENS-AORTA integration is working!")
-        print("🏗️  Full OpenFOAM cases created successfully!")
-        print("🚀 Ready for CFD simulations and uncertainty quantification!")
-        print("\n📋 Next steps:")
-        print("   1. Run blockMesh in each OpenFOAM case")
-        print("   2. Run snappyHexMesh to generate the mesh")
-        print("   3. Run your CFD solver (e.g., pimpleFoam)")
-        print("   4. Post-process results")
+        print("\n" + "="*70)
+        print("✅ QUEENS-AORTA INTEGRATION COMPLETE!")
+        print("="*70)
+        print("\n📦 What was created:")
+        print("   1. ✅ Parametric AAA geometries (geometries/)")
+        print("   2. ✅ Complete OpenFOAM cases (openfoam_cases/)")
+        print("   3. ✅ QUEENS output and samples (queens_output/)")
+        print("   4. ✅ Convex hull validation results")
+
+        print("\n🚀 Next steps:")
+        print("   Option A - Run simulations via Python:")
+        print("      • Edit run_full_integration.py: set run_simulations=True")
+        print("      • Re-run: python run_full_integration.py")
+
+        print("\n   Option B - Run simulations manually:")
+        print("      • cd openfoam_cases/case_000")
+        print("      • source /opt/openfoam9/etc/bashrc  # or your OpenFOAM path")
+        print("      • blockMesh")
+        print("      • surfaceFeatures")
+        print("      • snappyHexMesh -overwrite")
+        print("      • pimpleFoam  # or your solver")
+
+        print("\n   Option C - Use standalone runner:")
+        print("      • python run_openfoam_cases.py openfoam_cases/ --skip-solver")
+        print("      • python run_openfoam_cases.py openfoam_cases/ --parallel --num-procs 16")
+
+        print("\n   Option D - Submit to SLURM cluster:")
+        print("      • Create SLURM job script for each case")
+        print("      • Submit with: sbatch job_script.sh")
+
+        print("\n📊 For post-processing:")
+        print("   • Convert ParaView scripts to QUEENS data processors")
+        print("   • Extract WSS, pressure, velocity fields")
+        print("   • Perform uncertainty quantification")
+
     else:
         print("\n❌ Integration test failed - check errors above")
         sys.exit(1)
