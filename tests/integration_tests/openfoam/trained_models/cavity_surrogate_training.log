@@ -1,0 +1,82 @@
+09-25 13:41 queens.utils.ascii_art INFO                                                                                       
+09-25 13:41 queens.utils.ascii_art INFO                                             *                                         
+09-25 13:41 queens.utils.ascii_art INFO                                           * | *                                       
+09-25 13:41 queens.utils.ascii_art INFO                                          * \|/ *                                      
+09-25 13:41 queens.utils.ascii_art INFO                                     * * * \|O|/ * * *                                 
+09-25 13:41 queens.utils.ascii_art INFO                                      \o\o\o|O|o/o/o/                                  
+09-25 13:41 queens.utils.ascii_art INFO                                      (<><><>O<><><>)                                  
+09-25 13:41 queens.utils.ascii_art INFO                                       '==========='                                   
+09-25 13:41 queens.utils.ascii_art INFO                                                                                       
+09-25 13:41 queens.utils.ascii_art INFO               :'#######::'##::::'##:'########:'########:'##::: ##::'######::         
+09-25 13:41 queens.utils.ascii_art INFO               '##.... ##: ##:::: ##: ##.....:: ##.....:: ###:: ##:'##... ##:         
+09-25 13:41 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ##::::::: ##::::::: ####: ##: ##:::..::         
+09-25 13:41 queens.utils.ascii_art INFO                ##:::: ##: ##:::: ##: ######::: ######::: ## ## ##:. ######::         
+09-25 13:41 queens.utils.ascii_art INFO                ##:'## ##: ##:::: ##: ##...:::: ##...:::: ##. ####::..... ##:         
+09-25 13:41 queens.utils.ascii_art INFO                ##:.. ##:: ##:::: ##: ##::::::: ##::::::: ##:. ###:'##::: ##:         
+09-25 13:41 queens.utils.ascii_art INFO               : ##### ##:. #######:: ########: ########: ##::. ##:. ######::         
+09-25 13:41 queens.utils.ascii_art INFO               :.....:..:::.......:::........::........::..::::..:::......:::         
+09-25 13:41 queens.utils.ascii_art INFO                                                                                      
+09-25 13:41 queens.utils.ascii_art INFO                                                                                      
+09-25 13:41 queens.utils.ascii_art INFO                A general purpose framework for Uncertainty Quantification,           
+09-25 13:41 queens.utils.ascii_art INFO                 Physics-Informed Machine Learning, Bayesian Optimization,            
+09-25 13:41 queens.utils.ascii_art INFO                         Inverse Problems and Simulation Analytics                    
+09-25 13:41 queens.utils.ascii_art INFO                                                                                      
+09-25 13:41 queens.distributions.uniform INFO     
+09-25 13:41 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+09-25 13:41 queens.distributions.uniform INFO     |                                    Uniform                                    |
+09-25 13:41 queens.distributions.uniform INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-25 13:41 queens.distributions.uniform INFO     | self        : <queens.distributions.uniform.Uniform object at 0x78098dc35f90> |
+09-25 13:41 queens.distributions.uniform INFO     | lower_bound : 0.5                                                             |
+09-25 13:41 queens.distributions.uniform INFO     | upper_bound : 2.0                                                             |
+09-25 13:41 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+09-25 13:41 queens.distributions.uniform INFO     
+09-25 13:41 queens.distributions.uniform INFO     
+09-25 13:41 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+09-25 13:41 queens.distributions.uniform INFO     |                                    Uniform                                    |
+09-25 13:41 queens.distributions.uniform INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-25 13:41 queens.distributions.uniform INFO     | self        : <queens.distributions.uniform.Uniform object at 0x78098dcd1b50> |
+09-25 13:41 queens.distributions.uniform INFO     | lower_bound : 0.005                                                           |
+09-25 13:41 queens.distributions.uniform INFO     | upper_bound : 0.02                                                            |
+09-25 13:41 queens.distributions.uniform INFO     +-------------------------------------------------------------------------------+
+09-25 13:41 queens.distributions.uniform INFO     
+09-25 13:41 queens.parameters.parameters INFO     
+09-25 13:41 queens.parameters.parameters INFO     +-----------------------------------------------------------------------------------+
+09-25 13:41 queens.parameters.parameters INFO     |                                    Parameters                                     |
+09-25 13:41 queens.parameters.parameters INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-25 13:41 queens.parameters.parameters INFO     | self         : <queens.parameters.parameters.Parameters object at 0x78098c133a10> |
+09-25 13:41 queens.parameters.parameters INFO     | lid_velocity : <queens.distributions.uniform.Uniform object at 0x78098dc35f90>    |
+09-25 13:41 queens.parameters.parameters INFO     | viscosity    : <queens.distributions.uniform.Uniform object at 0x78098dcd1b50>    |
+09-25 13:41 queens.parameters.parameters INFO     +-----------------------------------------------------------------------------------+
+09-25 13:41 queens.parameters.parameters INFO     
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     +-------------------------------------------------------------------------------------------------------------------+
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     |                                                  GaussianProcess                                                  |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | self                       : <queens.models.surrogates.gaussian_process.GaussianProcess object at 0x78098c133810> |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | training_iterator          : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | testing_iterator           : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | eval_fit                   : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | error_measures             : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | plotting_options           : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | number_posterior_samples   : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | seed_optimizer             : 42                                                                                   |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | seed_posterior_samples     : None                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | restart_min_value          : 0                                                                                    |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | restart_max_value          : 5                                                                                    |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | number_restarts            : 10                                                                                   |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | number_training_iterations : 100                                                                                  |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | dimension_lengthscales     : 2                                                                                    |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     | train_likelihood_variance  : True                                                                                 |
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     +-------------------------------------------------------------------------------------------------------------------+
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 0/10    loss = 127.50974969787822
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 1/10    loss = 101.57127371659004
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 2/10    loss = 101.57127371348139
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 3/10    loss = 101.57127371786146
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 4/10    loss = 127.50974969787828
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 5/10    loss = 101.57127371348687
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 6/10    loss = 101.571273713885
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 7/10    loss = 101.57127371348604
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 8/10    loss = 127.50974981802842
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 9/10    loss = 101.57127371348105
+09-25 13:41 queens.models.surrogates.gaussian_process INFO     restart 10/10    loss = 101.57127371348525

@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from queens.data_processors.numpy_file import NumpyFile
     from queens.data_processors.pvd_file import PvdFile
     from queens.data_processors.txt_file import TxtFile
+    from queens.data_processors.paraview import DataProcessorParaview
 
 
 class_module_map = extract_type_checking_imports(__file__)
@@ -32,3 +33,4 @@ class_module_map = extract_type_checking_imports(__file__)
 
 def __getattr__(name):
     return import_class_from_class_module_map(name, class_module_map, __name__)
+
