@@ -33,6 +33,7 @@ from queens.models import Simulation
 # Import our QUEENS-compatible driver
 from aorta_queens_driver import AortaGeometryDriver
 from queens_aaa_config import create_aaa_parameters, load_fitted_distributions
+from run_openfoam_cases import OpenFOAMCaseRunner
 
 
 def main():
@@ -218,6 +219,59 @@ def main():
 
             print("\n🎉 Geometry generation completed successfully!")
 
+            # 9. Run OpenFOAM simulations on generated cases
+            print("\n" + "=" * 70)
+            print("🌊 RUNNING OPENFOAM SIMULATIONS")
+            print("=" * 70)
+
+            # Create OpenFOAM runner
+            runner = OpenFOAMCaseRunner(
+                openfoam_bashrc="/opt/spack/v0.23.1/opt/spack/linux-ubuntu24.04-sapphirerapids/gcc-13.3.0/openfoam-org-9-yjq7t3b3xh75m5s7u5bntedww5u7sekn/etc/bashrc",
+                solver="pimpleFoam",  # Transient solver for AAA blood flow
+                parallel=False,  # Set to True for parallel runs
+                num_procs=1,  # Increase for parallel runs (match decomposeParDict)
+                run_blockmesh=True,
+                run_snappyhexmesh=True,
+                run_solver=False  # Set to True to actually run the solver (takes long time!)
+            )
+
+            print("\n⚙️  OpenFOAM Configuration:")
+            print(f"   Solver: {runner.solver}")
+            print(f"   Parallel: {runner.parallel}")
+            print(f"   Processors: {runner.num_procs}")
+            print(f"   Steps: blockMesh={runner.run_blockmesh}, "
+                  f"snappyHexMesh={runner.run_snappyhexmesh}, "
+                  f"solver={runner.run_solver}")
+
+            # Option to run simulations
+            run_simulations = True  # Change to False to skip simulations
+
+            if run_simulations:
+                print("\n🚀 Running OpenFOAM simulations...")
+                sim_results = runner.run_multiple_cases(
+                    cases_dir='./openfoam_cases',
+                    sequential=True  # Run one case at a time
+                )
+
+                # Save simulation results
+                print(f"\n📊 Simulation Results:")
+                successful_sims = sum(1 for r in sim_results if r['success'])
+                print(f"   ✅ Successful: {successful_sims}/{len(sim_results)}")
+
+                if successful_sims < len(sim_results):
+                    print(f"   ❌ Failed: {len(sim_results) - successful_sims}")
+                    failed_cases = [r['case_id'] for r in sim_results if not r['success']]
+                    print(f"   Failed cases: {failed_cases}")
+            else:
+                print("\n⏭️  Skipping simulations (set run_simulations=True to run)")
+                print("   To run simulations manually:")
+                print("   1. cd openfoam_cases/case_000")
+                print("   2. source /opt/spack/v0.23.1/opt/spack/.../openfoam-org-9-.../etc/bashrc")
+                print("   3. blockMesh")
+                print("   4. surfaceFeatures")
+                print("   5. snappyHexMesh -overwrite")
+                print("   6. pimpleFoam")
+
             return True
 
     except Exception as e:
@@ -249,11 +303,13 @@ if __name__ == "__main__":
 
         print("\n🚀 Next steps:")
         print("   • Increase num_jobs for more parallelism")
-        print("   • Run OpenFOAM simulations on generated cases")
+        print("   • Set run_solver=True in runner config to run actual CFD solver")
         print("   • Switch to SlurmScheduler for HPC cluster")
 
-        print("\n📊 To run OpenFOAM simulations:")
-        print("   python run_openfoam_cases.py openfoam_cases/ --skip-solver")
+        print("\n📊 OpenFOAM Simulation Options:")
+        print("   • Edit run_simulations=True/False in the script")
+        print("   • Set runner.run_solver=True to run the full CFD solver")
+        print("   • Or run manually: python run_openfoam_cases.py openfoam_cases/ --skip-solver")
 
     else:
         print("\n❌ Integration failed - check errors above")
