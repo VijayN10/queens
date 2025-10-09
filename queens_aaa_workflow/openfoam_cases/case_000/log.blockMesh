@@ -1,0 +1,49 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 9
+Exec   : blockMesh
+Date   : Oct 09 2025
+Time   : 15:06:27
+Host   : "node01"
+PID    : 1256963
+I/O    : uncollated
+Case   : /home/a11evina/queens/queens_aaa_workflow/openfoam_cases/case_000
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Reading "blockMeshDict"
+
+Creating block mesh from
+    "system/blockMeshDict"
+Creating block edges
+No non-planar block faces defined
+Creating topology blocks
+Creating topology patches
+
+Creating block mesh topology
+
+Check topology
+
+	Basic statistics
+		Number of internal faces : 0
+		Number of boundary faces : 6
+		Number of defined boundary faces : 6
+		Number of undefined boundary faces : 0
+	Checking patch -> block consistency
+
+Creating block offsets
+Creating merge list .
+
+Creating polyMesh from blockMesh
+Creating patches
+Creating cells
