@@ -45,7 +45,6 @@ class Dask(Scheduler):
         experiment_dir,
         num_jobs,
         num_procs,
-        client,
         restart_workers,
         verbose=True,
     ):
@@ -56,7 +55,6 @@ class Dask(Scheduler):
             experiment_dir (Path): Path to QUEENS experiment directory.
             num_jobs (int): Maximum number of parallel jobs
             num_procs (int): number of processors per job
-            client (Client): Dask client that connects to and submits computation to a Dask cluster
             restart_workers (bool): If true, restart workers after each finished job
             verbose (bool, opt): Verbosity of evaluations. Defaults to True.
         """
@@ -67,8 +65,36 @@ class Dask(Scheduler):
             verbose=verbose,
         )
         self.num_procs = num_procs
-        self.client = client
         self.restart_workers = restart_workers
+
+        self.client = None
+        self.start_cluster_and_connect_client()
+
+    @abc.abstractmethod
+    def _start_cluster_and_connect_client(self):
+        """Start a Dask cluster and a client that connects to it.
+
+        Returns:
+               client (Client): Dask client that is connected to and submits computations to a
+                                Dask cluster.
+        """
+
+    def start_cluster_and_connect_client(self):
+        """Start a Dask cluster and a client that connects to it."""
+        if self.client is None or self.client.status == "closed":
+            client = self._start_cluster_and_connect_client()
+            self.register_shutdown(client)
+            self.client = client
+
+    def register_shutdown(self, client):
+        """Register shutdown callback.
+
+        The Dask client and cluster will be shut down when leaving the GlobalSettings context.
+
+        Args:
+            client (Client): Dask client that is connected to and submits computations to a
+                             Dask cluster.
+        """
         global SHUTDOWN_CLIENTS  # pylint: disable=global-variable-not-assigned
         SHUTDOWN_CLIENTS.append(client.shutdown)
 
@@ -83,6 +109,8 @@ class Dask(Scheduler):
         Returns:
             result_dict (dict): Dictionary containing results
         """
+        self.start_cluster_and_connect_client()
+
         if self.restart_workers:
             # This is necessary, because the subprocess in the driver does not get killed
             # sometimes when the worker is restarted.

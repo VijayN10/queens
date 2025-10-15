@@ -18,10 +18,10 @@ from queens.drivers.jobscript import Jobscript
 from queens.utils.logger_settings import log_init_args
 
 _JOBSCRIPT_TEMPLATE = """
-{{ mpi_cmd }} -np {{ num_procs }} {{ executable }} {{ input_file }} {{ output_file }}
+{{ mpi_cmd }} -n {{ num_procs }} {{ executable }} {{ input_file }} {{ output_file }}
 if [ ! -z "{{ post_processor|default("") }}" ]
 then
-  {{ mpi_cmd }} -np {{ num_procs }} {{ post_processor }} --file={{ output_file }} {{ post_options }}
+  {{ mpi_cmd }} -n {{ num_procs }} {{ post_processor }} --file={{ output_file }} {{ post_options }}
 fi
 """
 

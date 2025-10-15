@@ -9,3 +9,9 @@ Welcome to the QUEENS FAQ section! Here, you'll find answers to some of the most
 ```{toctree}
 faq/requirements
 ```
+
+## Directories and simulation model outputs
+
+```{toctree}
+faq/directories
+```

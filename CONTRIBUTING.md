@@ -96,3 +96,6 @@ Please use the available pull request template and fill out all sections of the 
 When you have submitted a pull request and the CI pipeline passes, it will be reviewed.
 Once your pull request is approved, there is a 24h waiting time (business days only) until the branch is merged into the
 main branch by the QUEENS maintainers. This ensures that the community has a chance to have a final look over the changes.
+This rule can be circumvented if and only if:
+- All the active maintainers approve the pull request.
+- The pull request is labeled as a quickfix by one of the maintainers and approved. Examples for this are one-liners, typos or urgent fixes that are time-critical.

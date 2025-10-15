@@ -84,6 +84,7 @@ class Cluster(Dask):
         restart_workers=False,
         allowed_failures=5,
         verbose=True,
+        experiment_base_dir=None,
     ):
         """Init method for the cluster scheduler.
 
@@ -104,6 +105,7 @@ class Cluster(Dask):
                                     jobs (>1min) this should be set to true in most cases.
             allowed_failures (int): Number of allowed failures for a task before an error is raised
             verbose (bool, opt): Verbosity of evaluations. Defaults to True.
+            experiment_base_dir (str, Path): Base directory for the simulation outputs
         """
         self.remote_connection = remote_connection
         self.remote_connection.open()
@@ -111,8 +113,19 @@ class Cluster(Dask):
         # sync remote source code with local state
         self.remote_connection.sync_remote_repository()
 
+        self.workload_manager = workload_manager
+        self.walltime = walltime
+        self.min_jobs = min_jobs
+        self.num_nodes = num_nodes
+        self.queue = queue
+        self.cluster_internal_address = cluster_internal_address
+        self.allowed_failures = allowed_failures
+
         # get the path of the experiment directory on remote host
-        experiment_dir = self.remote_connection.run_function(experiment_directory, experiment_name)
+        experiment_dir = self.remote_connection.run_function(
+            experiment_directory, experiment_name, experiment_base_dir
+        )
+
         _logger.debug(
             "experiment directory on %s@%s: %s",
             self.remote_connection.user,
@@ -120,18 +133,36 @@ class Cluster(Dask):
             experiment_dir,
         )
 
+        super().__init__(
+            experiment_name=experiment_name,
+            experiment_dir=experiment_dir,
+            num_jobs=num_jobs,
+            num_procs=num_procs,
+            restart_workers=restart_workers,
+            verbose=verbose,
+        )
+
+    def _start_cluster_and_connect_client(self):
+        """Start a Dask cluster and a client that connects to it.
+
+        Returns:
+               client (Client): Dask client that is connected to and submits computations to a
+                                Dask cluster.
+        """
         # collect all settings for the dask cluster
-        dask_cluster_options = get_option(VALID_WORKLOAD_MANAGERS, workload_manager)
-        job_extra_directives = dask_cluster_options["job_extra_directives"](num_nodes, num_procs)
+        dask_cluster_options = get_option(VALID_WORKLOAD_MANAGERS, self.workload_manager)
+        job_extra_directives = dask_cluster_options["job_extra_directives"](
+            self.num_nodes, self.num_procs
+        )
         job_directives_skip = dask_cluster_options["job_directives_skip"]
-        if queue is None:
+        if self.queue is None:
             job_directives_skip.append("#SBATCH -p")
 
-        hours, minutes, seconds = map(int, walltime.split(":"))
+        hours, minutes, seconds = map(int, self.walltime.split(":"))
         walltime_delta = timedelta(hours=hours, minutes=minutes, seconds=seconds)
 
         # Increase jobqueue walltime by 5 minutes to kill dask workers in time
-        walltime = timedelta_to_str(walltime_delta + timedelta(minutes=5))
+        increased_walltime = timedelta_to_str(walltime_delta + timedelta(minutes=5))
 
         # dask worker lifetime = walltime - 3m +/- 2m
         worker_lifetime = str(int((walltime_delta + timedelta(minutes=2)).total_seconds())) + "s"
@@ -142,38 +173,38 @@ class Cluster(Dask):
         scheduler_options = {
             "port": remote_port,
             "dashboard_address": remote_port_dashboard,
-            "allowed_failures": allowed_failures,
+            "allowed_failures": self.allowed_failures,
         }
-        if cluster_internal_address:
-            scheduler_options["contact_address"] = f"{cluster_internal_address}:{remote_port}"
+        if self.cluster_internal_address is not None:
+            scheduler_options["contact_address"] = f"{self.cluster_internal_address}:{remote_port}"
         dask_cluster_kwargs = {
-            "job_name": experiment_name,
-            "queue": queue,
+            "job_name": self.experiment_name,
+            "queue": self.queue,
             "memory": "10TB",
             "scheduler_options": scheduler_options,
-            "walltime": walltime,
-            "log_directory": str(experiment_dir),
+            "walltime": increased_walltime,
+            "log_directory": str(self.experiment_dir),
             "job_directives_skip": job_directives_skip,
             "job_extra_directives": [job_extra_directives],
             "worker_extra_args": ["--lifetime", worker_lifetime, "--lifetime-stagger", "2m"],
             # keep this hardcoded to 1, the number of threads for the mpi run is handled by
-            # job_extra_directives. Note that the number of workers is not the number of parallel
-            # simulations!
+            # job_extra_directives. Note that the number of workers is not the number of
+            # parallel simulations!
             "cores": 1,
             "processes": 1,
             "n_workers": 1,
         }
         dask_cluster_adapt_kwargs = {
-            "minimum_jobs": min_jobs,
-            "maximum_jobs": num_jobs,
+            "minimum_jobs": self.min_jobs,
+            "maximum_jobs": self.num_jobs,
         }
 
         # actually start the dask cluster on remote host
         stdout, stderr = self.remote_connection.start_cluster(
-            workload_manager,
+            self.workload_manager,
             dask_cluster_kwargs,
             dask_cluster_adapt_kwargs,
-            experiment_dir,
+            self.experiment_dir,
         )
         _logger.debug(stdout)
         _logger.debug(stderr)
@@ -198,16 +229,7 @@ class Cluster(Dask):
             "http://localhost:%i/status",
             local_port_dashboard,
         )
-
-        super().__init__(
-            experiment_name=experiment_name,
-            experiment_dir=experiment_dir,
-            num_jobs=num_jobs,
-            num_procs=num_procs,
-            client=client,
-            restart_workers=restart_workers,
-            verbose=verbose,
-        )
+        return client
 
     def restart_worker(self, worker):
         """Restart a worker.

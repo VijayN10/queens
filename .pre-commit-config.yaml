@@ -77,7 +77,16 @@ repos:
         additional_dependencies: ["toml"]
         always_run: false
         pass_filenames: true
-repos:
+        exclude: '^tests/'
+      - id: pylint-tests
+        name: pylint (tests)
+        entry: pylint --disable=duplicate-code
+        language: python
+        types: ["python"]
+        additional_dependencies: ["toml"]
+        always_run: false
+        pass_filenames: true
+        files: '^tests/'
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
     hooks:

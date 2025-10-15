@@ -24,7 +24,7 @@ from pathlib import Path
 from queens.schedulers._dask import SHUTDOWN_CLIENTS
 from queens.utils.ascii_art import print_banner_and_description
 from queens.utils.logger_settings import reset_logging, setup_basic_logging
-from queens.utils.path import PATH_TO_ROOT
+from queens.utils.path import PATH_TO_ROOT, create_folder_if_not_existent
 from queens.utils.printing import get_str_table
 from queens.utils.run_subprocess import run_subprocess
 
@@ -49,16 +49,14 @@ class GlobalSettings:
             output_dir (str, Path): Output directory for queens run
             debug (bool): True if debug mode is to be used
         """
-        output_dir = Path(output_dir)
-        if not output_dir.is_dir():
-            raise FileNotFoundError(f"Output directory {output_dir} does not exist.")
+        self.output_dir = create_folder_if_not_existent(output_dir)
 
         # Remove spaces as they can cause problems later on
         if " " in experiment_name:
             raise ValueError("Experiment name can not contain spaces!")
 
         self.experiment_name = experiment_name
-        self.output_dir = Path(output_dir)
+
         self.debug = debug
 
         # set up logging

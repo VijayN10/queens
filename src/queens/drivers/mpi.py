@@ -18,7 +18,7 @@ from queens.drivers.jobscript import Jobscript
 from queens.utils.logger_settings import log_init_args
 
 _JOBSCRIPT_TEMPLATE = (
-    "{{ mpi_cmd }} -np {{ num_procs }} {{ executable }} {{ input_file }} {{ output_file }}"
+    "{{ mpi_cmd }} -n {{ num_procs }} {{ executable }} {{ input_file }} {{ output_file }}"
 )
 
 

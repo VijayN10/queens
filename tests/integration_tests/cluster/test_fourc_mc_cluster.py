@@ -81,12 +81,18 @@ class TestDaskCluster:
         Note that we also rely on this local mock here!
         """
 
-        def patch_experiments_directory(experiment_name):
+        def patch_experiments_directory(experiment_name, experiment_base_directory=None):
             """Base directory for all experiments on the computing machine."""
-            experiments_dir = (
-                Path(queens_base_directory_on_cluster.replace("$HOME", str(Path.home())))
-                / experiment_name
-            )
+            if experiment_base_directory is None:
+                experiment_base_directory = Path(
+                    queens_base_directory_on_cluster.replace("$HOME", str(Path.home()))
+                )
+            else:
+                raise ValueError(
+                    "This mock function does not support specifying 'experiment_base_directory'. "
+                    "It must be called with 'experiment_base_directory=None'."
+                )
+            experiments_dir = experiment_base_directory / experiment_name
             Path.mkdir(experiments_dir, parents=True, exist_ok=True)
             return experiments_dir
 

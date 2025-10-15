@@ -30,7 +30,13 @@ class Local(Dask):
 
     @log_init_args
     def __init__(
-        self, experiment_name, num_jobs=1, num_procs=1, restart_workers=False, verbose=True
+        self,
+        experiment_name,
+        num_jobs=1,
+        num_procs=1,
+        restart_workers=False,
+        verbose=True,
+        experiment_base_dir=None,
     ):
         """Initialize local scheduler.
 
@@ -41,28 +47,41 @@ class Local(Dask):
             restart_workers (bool): If true, restart workers after each finished job. Try setting it
                                     to true in case you are experiencing memory-leakage warnings.
             verbose (bool, opt): Verbosity of evaluations. Defaults to True.
+            experiment_base_dir (str, Path): Base directory for the simulation outputs
         """
-        experiment_dir = experiment_directory(experiment_name=experiment_name)
+        experiment_dir = experiment_directory(
+            experiment_name=experiment_name, experiment_base_directory=experiment_base_dir
+        )
 
-        cluster = LocalCluster(
-            n_workers=num_jobs,
-            processes=True,
-            threads_per_worker=num_procs,
-            silence_logs=False,
-        )
-        client = Client(cluster)
-        _logger.info(
-            "To view the Dask dashboard open this link in your browser: %s", client.dashboard_link
-        )
         super().__init__(
             experiment_name=experiment_name,
             experiment_dir=experiment_dir,
             num_jobs=num_jobs,
-            num_procs=num_procs,
-            client=client,
+            num_procs=1,  # keep this hardcoded to 1,
+            # the number of threads for the mpi run is handled by the driver.
             restart_workers=restart_workers,
             verbose=verbose,
         )
+
+    def _start_cluster_and_connect_client(self):
+        """Start a Dask cluster and a client that connects to it.
+
+        Returns:
+               client (Client): Dask client that is connected to and submits computations to a
+                                Dask cluster.
+        """
+        cluster = LocalCluster(
+            n_workers=self.num_jobs,
+            processes=True,
+            threads_per_worker=self.num_procs,
+            silence_logs=False,
+        )
+        client = Client(cluster)
+        _logger.info(
+            "To view the Dask dashboard open this link in your browser: %s",
+            client.dashboard_link,
+        )
+        return client
 
     def restart_worker(self, worker):
         """Restart a worker.

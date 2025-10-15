@@ -49,15 +49,21 @@ def base_directory():
     return base_dir
 
 
-def experiment_directory(experiment_name):
+def experiment_directory(experiment_name, experiment_base_directory=None):
     """Directory for data of a specific experiment on the computing machine.
 
-    Refer to base_directory() for an explanation of the directory structure.
+    If no experiment_base_directory is provied, base_directory() is used as default.
 
     Args:
         experiment_name (str): Experiment name
+        experiment_base_directory (str, Path): Base directory for the experiment directory
     """
-    experiment_dir = base_directory() / experiment_name
+    if experiment_base_directory is None:
+        experiment_base_directory = base_directory()
+    else:
+        experiment_base_directory = Path(experiment_base_directory)
+
+    experiment_dir = experiment_base_directory / experiment_name
     create_directory(experiment_dir)
     return experiment_dir
 
